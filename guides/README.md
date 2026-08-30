@@ -27,6 +27,12 @@ only when its first reviewed article is ready.
   traces firmware discovery, Secure Boot verification, systemd-boot, UKIs,
   initramfs, LUKS, LVM, root mounting, systemd handoff, updates, and recovery.
 
+### Storage
+
+- [Storage layers, encryption, memory, and discard](storage/06-storage-layers-encryption-memory-and-trim.md)
+  explains NVMe, GPT, stable identifiers, LUKS2, dm-crypt, LVM, ext4,
+  persistent mounts, disk swap, zram, TRIM, SSD spare space, and safe recovery.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |
