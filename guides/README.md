@@ -10,6 +10,9 @@ only when its first reviewed article is ready.
 - [Configuration files, drop-ins, and precedence](foundations/01-configuration-files-and-drop-ins.md)
   explains `/usr`, `/etc`, user configuration, program-specific precedence,
   package updates, inspection, and safe rollback.
+- [Users, permissions, sudo, and PAM](foundations/02-users-permissions-sudo-and-pam.md)
+  separates identity, file access, delegated privilege, authentication stacks,
+  graphical authorization, and safe recovery.
 
 | Guide family | Planned subjects |
 | --- | --- |
