@@ -13,6 +13,9 @@ only when its first reviewed article is ready.
 - [Users, permissions, sudo, and PAM](foundations/02-users-permissions-sudo-and-pam.md)
   separates identity, file access, delegated privilege, authentication stacks,
   graphical authorization, and safe recovery.
+- [Systemd units, activation, and the journal](foundations/03-systemd-units-activation-and-journal.md)
+  explains unit types, runtime and enablement states, dependencies, services,
+  sockets, timers, targets, user managers, generators, logs, and recovery.
 
 | Guide family | Planned subjects |
 | --- | --- |
