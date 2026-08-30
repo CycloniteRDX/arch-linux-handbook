@@ -21,6 +21,12 @@ only when its first reviewed article is ready.
   configuration merges, cache, mirrors, foreign packages, AUR review, and
   recovery.
 
+### Boot and trust
+
+- [From UEFI firmware to the mounted root filesystem](boot-and-trust/05-uefi-to-root-boot-chain.md)
+  traces firmware discovery, Secure Boot verification, systemd-boot, UKIs,
+  initramfs, LUKS, LVM, root mounting, systemd handoff, updates, and recovery.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |
