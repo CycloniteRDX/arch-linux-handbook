@@ -26,6 +26,9 @@ only when its first reviewed article is ready.
 - [From UEFI firmware to the mounted root filesystem](boot-and-trust/05-uefi-to-root-boot-chain.md)
   traces firmware discovery, Secure Boot verification, systemd-boot, UKIs,
   initramfs, LUKS, LVM, root mounting, systemd handoff, updates, and recovery.
+- [Secure Boot trust, signing, and recovery](boot-and-trust/07-secure-boot-trust-signing-and-recovery.md)
+  explains PK, KEK, db, dbx, Setup Mode, owner and Microsoft certificates,
+  signed UKIs, sbctl state, update safety, threat boundaries, and recovery.
 
 ### Storage
 
