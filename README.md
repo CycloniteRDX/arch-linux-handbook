@@ -6,8 +6,10 @@ repositories.
 
 ## Project status
 
-Early design stage. The guide taxonomy is defined; legacy material will be
-reviewed and migrated selectively instead of copied wholesale.
+Active writing stage. The taxonomy and article standard are defined, and the
+first reviewed guide establishes how configuration files and overrides are
+interpreted. Further articles will be added by topic rather than by repeating
+the installation sequence.
 
 ## Purpose
 

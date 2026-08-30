@@ -1,7 +1,15 @@
 # Handbook index
 
-This is the initial topic map. A category should be created only when its first
-reviewed article is ready.
+This index is both a reading map and a writing backlog. A directory is created
+only when its first reviewed article is ready.
+
+## Published guides
+
+### Foundations
+
+- [Configuration files, drop-ins, and precedence](foundations/01-configuration-files-and-drop-ins.md)
+  explains `/usr`, `/etc`, user configuration, program-specific precedence,
+  package updates, inspection, and safe rollback.
 
 | Guide family | Planned subjects |
 | --- | --- |
@@ -15,6 +23,30 @@ reviewed article is ready.
 | Workstation | Graphics, audio, Bluetooth, printing, XDG directories, fonts, portals, polkit, secrets, and removable media. |
 | Niri ecosystem | Wayland fundamentals, Niri concepts, launchers, bars, notifications, locking, idle handling, portals, screenshots, and theming. |
 | Maintenance and recovery | Backups, package incidents, chroot recovery, boot recovery, storage checks, logs, and rollback strategies. |
+
+## Recommended writing order
+
+The order below follows conceptual dependencies, not the post-install chapter
+numbers:
+
+1. **Foundations:** configuration sources and precedence; ownership,
+   permissions, sudo, and PAM; systemd units, activation, and the journal;
+   package lifecycle, `.pacnew`, mirrors, and AUR boundaries.
+2. **System architecture:** the UEFI-to-root boot chain; LUKS, LVM, ext4,
+   swap, zram, and TRIM; Secure Boot keys, signing, threat model, and recovery.
+3. **Workstation integration:** NetworkManager and DNS; firewalld, nftables,
+   and zones; polkit versus XDG Desktop Portals; PipeWire and WirePlumber;
+   Bluetooth, UDisks, GVfs, Secret Service, and PAM; TLP, logind, idle, and
+   suspend.
+4. **Wayland and Niri:** compositor and XWayland concepts; Niri and GNU Stow;
+   Mako, Waybar, Fuzzel, Eww, and component boundaries; greetd, swaylock, and
+   the graphical-session lifecycle; outputs and per-host overrides.
+5. **Maintenance and extensions:** Restic and restore drills; journal-led
+   diagnosis and chroot recovery; update workflow; Plymouth and boot
+   appearance; TPM2-bound unlock; theming and desktop polish.
+
+This backlog may grow when a runbook or post-install instruction relies on a
+concept that deserves an explanation of its own.
 
 ## Article shape
 
