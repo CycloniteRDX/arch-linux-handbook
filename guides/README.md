@@ -45,6 +45,13 @@ only when its first reviewed article is ready.
   explains stateful filtering, zone assignment, services and ports, runtime and
   permanent state, forwarding, NAT, NetworkManager integration, and diagnosis.
 
+### Workstation
+
+- [Polkit authorization and XDG Desktop Portals](workstation/10-polkit-and-xdg-desktop-portals.md)
+  separates privileged action authorization, authentication agents, portal
+  brokers and backends, session activation, file grants, screenshots,
+  screencasting, notifications, secrets, verification, and recovery.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |
