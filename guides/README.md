@@ -51,6 +51,10 @@ only when its first reviewed article is ready.
   separates privileged action authorization, authentication agents, portal
   brokers and backends, session activation, file grants, screenshots,
   screencasting, notifications, secrets, verification, and recovery.
+- [PipeWire, WirePlumber, and audio routing](workstation/11-pipewire-wireplumber-and-audio-routing.md)
+  explains ALSA and Bluetooth boundaries, the PipeWire graph, WirePlumber
+  policy, profiles, routes, defaults, compatibility APIs, state, latency,
+  verification, and recovery.
 
 | Guide family | Planned subjects |
 | --- | --- |
