@@ -59,6 +59,10 @@ only when its first reviewed article is ready.
   explains BlueZ devices and trust, UDisks authorization, udiskie automount,
   GIO/GVfs and MTP, GNOME Keyring, Secret Service, PAM unlock paths, safe
   removal, verification, and recovery.
+- [TLP, logind, idle handling, and suspend](workstation/13-tlp-logind-idle-and-suspend.md)
+  explains power-policy ownership, TLP profiles, ThinkPad charge thresholds,
+  platform profiles, lid handling, sleep states, inhibitors, pre-suspend
+  locking, resume verification, and layered diagnosis.
 
 | Guide family | Planned subjects |
 | --- | --- |
