@@ -78,6 +78,10 @@ only when its first reviewed article is ready.
   traces the login boundary from the system service and terminal greeter
   through PAM, logind, `niri-session`, the user manager, logout, verification,
   and TTY or installation-media recovery.
+- [Niri outputs, scaling, external displays, and host overrides](niri-ecosystem/17-niri-outputs-scaling-and-host-overrides.md)
+  explains connectors and display identity, modes and refresh rates, physical
+  versus logical pixels, fractional scaling, coordinates, hot-plug, lid
+  behavior, workspace migration, and a portable per-ThinkPad override design.
 
 ## Current roadmap
 
@@ -90,8 +94,8 @@ on them to be understandable or recoverable.
 | Guide | Status | Planned subject |
 | --- | --- | --- |
 | 16 | Published | greetd, tuigreet, PAM, session creation, logout, and graphical-login recovery. |
-| 17 | Next | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
-| 18 | Planned | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
+| 17 | Published | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
+| 18 | Next | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
 | 19 | Planned | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
 | 20 | Planned | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
 | 21 | Extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
@@ -101,7 +105,7 @@ on them to be understandable or recoverable.
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-After guide 16, four essential guides and six extensions remain in this map.
+After guide 17, three essential guides and six extensions remain in this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
