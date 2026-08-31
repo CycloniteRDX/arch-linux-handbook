@@ -36,6 +36,12 @@ only when its first reviewed article is ready.
   explains NVMe, GPT, stable identifiers, LUKS2, dm-crypt, LVM, ext4,
   persistent mounts, disk swap, zram, TRIM, SSD spare space, and safe recovery.
 
+### Networking
+
+- [NetworkManager, addressing, routes, and DNS](networking/08-networkmanager-addressing-routes-and-dns.md)
+  explains devices and profiles, Wi-Fi, DHCP, IPv4 and IPv6, routes, DNS,
+  `/etc/resolv.conf`, local resolvers, privacy boundaries, and layered diagnosis.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |
