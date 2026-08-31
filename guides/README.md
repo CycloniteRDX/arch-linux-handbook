@@ -55,6 +55,10 @@ only when its first reviewed article is ready.
   explains ALSA and Bluetooth boundaries, the PipeWire graph, WirePlumber
   policy, profiles, routes, defaults, compatibility APIs, state, latency,
   verification, and recovery.
+- [Bluetooth, removable media, and Secret Service](workstation/12-bluetooth-removable-media-and-secret-service.md)
+  explains BlueZ devices and trust, UDisks authorization, udiskie automount,
+  GIO/GVfs and MTP, GNOME Keyring, Secret Service, PAM unlock paths, safe
+  removal, verification, and recovery.
 
 | Guide family | Planned subjects |
 | --- | --- |
