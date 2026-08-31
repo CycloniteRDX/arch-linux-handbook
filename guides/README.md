@@ -64,6 +64,13 @@ only when its first reviewed article is ready.
   platform profiles, lid handling, sleep states, inhibitors, pre-suspend
   locking, resume verification, and layered diagnosis.
 
+### Niri ecosystem
+
+- [Wayland, Niri, and the graphical session](niri-ecosystem/14-wayland-niri-and-session-architecture.md)
+  explains the compositor model, session startup, environment propagation,
+  sockets, native and X11 clients, application identity, window rules,
+  outputs, IPC, layer-shell components, portals, and GNU Stow boundaries.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |
