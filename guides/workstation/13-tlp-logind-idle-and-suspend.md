@@ -855,10 +855,32 @@ reviewable policy.
 
 ### Automatic idle suspend
 
-It can be added later through one deliberately selected owner after
-notifications, media inhibition, downloads, external-display behavior, and
-resume reliability are understood. The current baseline stops at locking and
-display power-off.
+The accepted future direction is a three-stage idle sequence:
+
+1. lock the existing graphical session;
+2. power off the displays after a longer idle interval;
+3. request suspend after a third, still longer interval.
+
+“Lock” is deliberate wording. Logging out would terminate Niri and its user
+processes, including the idle coordinator that is expected to request the later
+suspend. Automatic logout is a different and more destructive policy.
+
+The third timeout is not configured yet. Before choosing it, the project must
+decide:
+
+- whether automatic suspend applies on battery, AC, or both;
+- how long downloads, builds, media playback, presentations, and screen sharing
+  may keep the system awake;
+- how external displays and docked use affect the timer;
+- whether swayidle or a future desktop shell is the sole idle-policy owner;
+- how the chosen owner observes Wayland, D-Bus, and systemd inhibitors;
+- how it guarantees the locker is established before `systemctl suspend`;
+- how monitor power, Wi-Fi, audio, Bluetooth, TLP, and the lock screen recover.
+
+The current baseline therefore stops at locking and display power-off. When
+automatic suspend is implemented, it will be added as a separately reviewed
+change with one owner, an explicit rollback, and repeated AC, battery, lid, and
+resume tests.
 
 ### Hibernation
 

@@ -70,6 +70,10 @@ only when its first reviewed article is ready.
   explains the compositor model, session startup, environment propagation,
   sockets, native and X11 clients, application identity, window rules,
   outputs, IPC, layer-shell components, portals, and GNU Stow boundaries.
+- [Waybar, Fuzzel, Mako, Eww, and shell evolution](niri-ecosystem/15-session-components-and-shell-evolution.md)
+  separates bars, launchers, notification daemons, widget systems, lockers,
+  idle coordinators, and complete shells; it records the safe path toward a
+  more polished lock screen, notification center, and automatic idle suspend.
 
 | Guide family | Planned subjects |
 | --- | --- |
