@@ -41,6 +41,9 @@ only when its first reviewed article is ready.
 - [NetworkManager, addressing, routes, and DNS](networking/08-networkmanager-addressing-routes-and-dns.md)
   explains devices and profiles, Wi-Fi, DHCP, IPv4 and IPv6, routes, DNS,
   `/etc/resolv.conf`, local resolvers, privacy boundaries, and layered diagnosis.
+- [Firewalld, nftables, zones, and host exposure](networking/09-firewalld-nftables-zones-and-host-exposure.md)
+  explains stateful filtering, zone assignment, services and ports, runtime and
+  permanent state, forwarding, NAT, NetworkManager integration, and diagnosis.
 
 | Guide family | Planned subjects |
 | --- | --- |
