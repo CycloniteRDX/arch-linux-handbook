@@ -63,6 +63,10 @@ only when its first reviewed article is ready.
   explains power-policy ownership, TLP profiles, ThinkPad charge thresholds,
   platform profiles, lid handling, sleep states, inhibitors, pre-suspend
   locking, resume verification, and layered diagnosis.
+- [XDG directories, desktop entries, MIME associations, fonts, and locales](workstation/18-xdg-directories-desktop-entries-mime-and-fonts.md)
+  explains base and user directories, portable versus generated state,
+  locale and keyboard boundaries, application metadata, MIME detection and
+  defaults, Fontconfig selection, integration diagnosis, and safe recovery.
 
 ### Niri ecosystem
 
@@ -95,8 +99,8 @@ on them to be understandable or recoverable.
 | --- | --- | --- |
 | 16 | Published | greetd, tuigreet, PAM, session creation, logout, and graphical-login recovery. |
 | 17 | Published | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
-| 18 | Next | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
-| 19 | Planned | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
+| 18 | Published | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
+| 19 | Next | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
 | 20 | Planned | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
 | 21 | Extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
@@ -105,7 +109,7 @@ on them to be understandable or recoverable.
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-After guide 17, three essential guides and six extensions remain in this map.
+After guide 18, two essential guides and six extensions remain in this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
@@ -135,7 +139,8 @@ numbers:
 3. **Workstation integration:** NetworkManager and DNS; firewalld, nftables,
    and zones; polkit versus XDG Desktop Portals; PipeWire and WirePlumber;
    Bluetooth, UDisks, GVfs, Secret Service, and PAM; TLP, logind, idle, and
-   suspend.
+   suspend; XDG directories, desktop entries, MIME defaults, fonts, and
+   locales.
 4. **Wayland and Niri:** compositor and XWayland concepts; Niri and GNU Stow;
    Mako, Waybar, Fuzzel, Eww, and component boundaries; greetd, swaylock, and
    the graphical-session lifecycle; outputs and per-host overrides.
