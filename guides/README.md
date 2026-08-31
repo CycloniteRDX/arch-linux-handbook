@@ -87,6 +87,14 @@ only when its first reviewed article is ready.
   versus logical pixels, fractional scaling, coordinates, hot-plug, lid
   behavior, workspace migration, and a portable per-ThinkPad override design.
 
+### Maintenance and recovery
+
+- [Restic backups, retention, restore drills, and recovery media](maintenance-and-recovery/19-restic-backups-retention-and-restore-drills.md)
+  explains backup boundaries, repository structure and encryption, source
+  selection, integrity checks, safe restores, candidate retention, secondary
+  copies, future scheduling, recovery bundles, installation media, and failure
+  recovery.
+
 ## Current roadmap
 
 The current milestone has two boundaries. Guide 20 closes the first essential
@@ -100,8 +108,8 @@ on them to be understandable or recoverable.
 | 16 | Published | greetd, tuigreet, PAM, session creation, logout, and graphical-login recovery. |
 | 17 | Published | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
 | 18 | Published | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
-| 19 | Next | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
-| 20 | Planned | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
+| 19 | Published | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
+| 20 | Next | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
 | 21 | Extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
@@ -109,7 +117,7 @@ on them to be understandable or recoverable.
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-After guide 18, two essential guides and six extensions remain in this map.
+After guide 19, one essential guide and six extensions remain in this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
