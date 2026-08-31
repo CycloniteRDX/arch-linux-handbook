@@ -74,6 +74,36 @@ only when its first reviewed article is ready.
   separates bars, launchers, notification daemons, widget systems, lockers,
   idle coordinators, and complete shells; it records the safe path toward a
   more polished lock screen, notification center, and automatic idle suspend.
+- [greetd, tuigreet, PAM, and graphical login recovery](niri-ecosystem/16-greetd-tuigreet-pam-and-login-recovery.md)
+  traces the login boundary from the system service and terminal greeter
+  through PAM, logind, `niri-session`, the user manager, logout, verification,
+  and TTY or installation-media recovery.
+
+## Current roadmap
+
+The current milestone has two boundaries. Guide 20 closes the first essential
+edition: at that point the handbook will explain every major subsystem needed
+to operate, diagnose, maintain, and recover the installed workstation. Guides
+21 through 26 are already accepted extensions, but the system does not depend
+on them to be understandable or recoverable.
+
+| Guide | Status | Planned subject |
+| --- | --- | --- |
+| 16 | Published | greetd, tuigreet, PAM, session creation, logout, and graphical-login recovery. |
+| 17 | Next | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
+| 18 | Planned | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
+| 19 | Planned | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
+| 20 | Planned | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
+| 21 | Extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
+| 22 | Extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
+| 23 | Extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
+| 24 | Extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
+| 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
+| 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
+
+After guide 16, four essential guides and six extensions remain in this map.
+New subjects may still be added when they expose a missing conceptual or
+recovery boundary.
 
 | Guide family | Planned subjects |
 | --- | --- |
