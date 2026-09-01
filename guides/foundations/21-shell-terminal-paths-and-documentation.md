@@ -1114,9 +1114,11 @@ restart semantics.
 
 ### Vim is a recovery literacy skill, not the current editor choice
 
-The project does not currently install or configure Vim as its canonical
-editor. However, a recovery environment, remote host, or dedicated command
-such as `visudo` may present a vi-like editor. The smallest survival model is:
+The project installs Vim without plugins or user configuration, but it does
+not select Vim as the canonical editor. Micro remains the convenient default
+for terminal editing. A recovery environment, remote host, or dedicated
+command such as `visudo` may still present a vi-like editor. The smallest
+survival model is:
 
 | Input | Meaning in a vi-compatible editor |
 | --- | --- |
@@ -1129,7 +1131,7 @@ such as `visudo` may present a vi-like editor. The smallest survival model is:
 
 These commands do not apply to Micro. Check the editor actually on screen
 before using them. A future editor-comparison guide or dotfile decision may go
-deeper; this guide does not install Vim merely for familiarity.
+deeper; the installed Vim remains an uncustomized secondary and recovery tool.
 
 ### Editor-selection variables
 
@@ -1546,8 +1548,8 @@ history privacy, `fzf` integration, aliases, script linting, and rollback.
 
 - Kitty remains the terminal emulator and Bash remains the login and
   interactive shell.
-- Micro remains the canonical terminal editor; Vim literacy is documented
-  without installing or configuring Vim.
+- Micro remains the canonical terminal editor; Vim remains installed without
+  user configuration as a secondary learning and recovery tool.
 - PowerShell is used for Windows repository handoffs, and package Git commands
   remain on one line where practical.
 - Bash and PowerShell code fences are never assumed interchangeable.
