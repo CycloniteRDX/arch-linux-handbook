@@ -82,6 +82,11 @@ only when its first reviewed article is ready.
   explains base and user directories, portable versus generated state,
   locale and keyboard boundaries, application metadata, MIME detection and
   defaults, Fontconfig selection, integration diagnosis, and safe recovery.
+- [Printing, scanning, and peripheral integration](workstation/23-printing-scanning-and-peripheral-integration.md)
+  explains CUPS queues and jobs, driverless IPP, local versus shared roles,
+  discovery and firewalld boundaries, polkit administration, IPP-over-USB,
+  SANE and AirScan, udev identity, device access, power policy, diagnosis, and
+  recovery.
 
 ### Niri ecosystem
 
@@ -131,12 +136,12 @@ recoverable.
 | 20 | Published | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
 | 21 | Published | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Published | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
-| 23 | Next extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
-| 24 | Extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
+| 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
+| 24 | Next extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. Four accepted extensions remain in
+The first essential edition is complete. Three accepted extensions remain in
 this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
