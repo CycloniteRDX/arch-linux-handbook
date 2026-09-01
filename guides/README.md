@@ -27,6 +27,15 @@ only when its first reviewed article is ready.
   operations, Micro, startup files, PowerShell boundaries, and how to read
   local and online documentation.
 
+### Git and GitHub
+
+- [Git, GitHub, SSH authentication, and repository
+  workflow](git-and-github/22-git-github-ssh-and-repository-workflow.md)
+  distinguishes local version control, remote hosting, author identity, SSH
+  authentication, and authorization; it explains repository state, deliberate
+  staging, Conventional Commits, branches, synchronization, conflicts,
+  cross-platform policy, and safe recovery.
+
 ### Boot and trust
 
 - [From UEFI firmware to the mounted root filesystem](boot-and-trust/05-uefi-to-root-boot-chain.md)
@@ -121,13 +130,13 @@ recoverable.
 | 19 | Published | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
 | 20 | Published | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
 | 21 | Published | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
-| 22 | Next extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
-| 23 | Extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
+| 22 | Published | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
+| 23 | Next extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. Five accepted extensions remain in
+The first essential edition is complete. Four accepted extensions remain in
 this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
@@ -163,9 +172,11 @@ numbers:
 4. **Wayland and Niri:** compositor and XWayland concepts; Niri and GNU Stow;
    Mako, Waybar, Fuzzel, Eww, and component boundaries; greetd, swaylock, and
    the graphical-session lifecycle; outputs and per-host overrides.
-5. **Maintenance and extensions:** Restic and restore drills; journal-led
-   diagnosis and chroot recovery; update workflow; Plymouth and boot
-   appearance; TPM2-bound unlock; theming and desktop polish.
+5. **Operator tooling:** shell and terminal fundamentals; Git's repository
+   model; GitHub and SSH authentication; deliberate publication and recovery.
+6. **Maintenance and extensions:** Restic and restore drills; journal-led
+   diagnosis and chroot recovery; update workflow; printing and peripherals;
+   Plymouth and boot appearance; TPM2-bound unlock; theming and desktop polish.
 
 This backlog may grow when a runbook or post-install instruction relies on a
 concept that deserves an explanation of its own.
