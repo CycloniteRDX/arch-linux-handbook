@@ -20,6 +20,12 @@ only when its first reviewed article is ready.
   explains pacman transactions, package state and queries, complete upgrades,
   configuration merges, cache, mirrors, foreign packages, AUR review, and
   recovery.
+- [Shell, terminal, paths, redirection, editors, and
+  documentation](foundations/21-shell-terminal-paths-and-documentation.md)
+  distinguishes terminal and shell layers and explains Bash parsing, paths,
+  quoting, environments, standard streams, exit statuses, jobs, safe file
+  operations, Micro, startup files, PowerShell boundaries, and how to read
+  local and online documentation.
 
 ### Boot and trust
 
@@ -114,14 +120,14 @@ recoverable.
 | 18 | Published | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
 | 19 | Published | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
 | 20 | Published | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
-| 21 | Next extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
-| 22 | Extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
+| 21 | Published | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
+| 22 | Next extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. Six accepted extensions remain in
+The first essential edition is complete. Five accepted extensions remain in
 this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
