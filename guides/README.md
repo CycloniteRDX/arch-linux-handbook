@@ -94,14 +94,18 @@ only when its first reviewed article is ready.
   selection, integrity checks, safe restores, candidate retention, secondary
   copies, future scheduling, recovery bundles, installation media, and failure
   recovery.
+- [Journal-led diagnosis, update incidents, and chroot recovery](maintenance-and-recovery/20-journal-update-incidents-and-chroot-recovery.md)
+  connects bounded journal queries, package transactions, boot stages, TTY and
+  ISO escalation, mounted-system inspection, chroot repair, offline ext4
+  diagnosis, incident records, and the recurring maintenance cadence.
 
 ## Current roadmap
 
-The current milestone has two boundaries. Guide 20 closes the first essential
-edition: at that point the handbook will explain every major subsystem needed
-to operate, diagnose, maintain, and recover the installed workstation. Guides
-21 through 26 are already accepted extensions, but the system does not depend
-on them to be understandable or recoverable.
+Guides 01 through 20 now form the first essential edition: the handbook
+explains every major subsystem needed to operate, diagnose, maintain, and
+recover the installed workstation. Guides 21 through 26 are accepted
+extensions, but the system does not depend on them to be understandable or
+recoverable.
 
 | Guide | Status | Planned subject |
 | --- | --- | --- |
@@ -109,15 +113,16 @@ on them to be understandable or recoverable.
 | 17 | Published | Niri outputs, scaling, lid/external-display behavior, and per-host overrides for the two ThinkPads. |
 | 18 | Published | XDG directories, desktop entries, MIME associations, fonts, locales, and application integration. |
 | 19 | Published | Restic repositories, backup boundaries, retention, restore drills, and recovery media. |
-| 20 | Next | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
-| 21 | Extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
+| 20 | Published | Journal-led diagnosis, update incidents, chroot and boot recovery, and the recurring maintenance workflow. |
+| 21 | Next extension | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Extension | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Extension | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-After guide 19, one essential guide and six extensions remain in this map.
+The first essential edition is complete. Six accepted extensions remain in
+this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
