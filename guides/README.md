@@ -44,6 +44,11 @@ only when its first reviewed article is ready.
 - [Secure Boot trust, signing, and recovery](boot-and-trust/07-secure-boot-trust-signing-and-recovery.md)
   explains PK, KEK, db, dbx, Setup Mode, owner and Microsoft certificates,
   signed UKIs, sbctl state, update safety, threat boundaries, and recovery.
+- [Plymouth, early-boot presentation, and recovery](boot-and-trust/24-plymouth-early-boot-presentation-and-recovery.md)
+  explains firmware-to-greeter visual handoffs, Plymouth architecture,
+  graphical LUKS requests, KMS and SimpleDRM, quiet versus splash, distinct
+  graphical and textual UKIs, themes, signing, testing, diagnosis, and
+  recovery.
 
 ### Storage
 
@@ -137,11 +142,11 @@ recoverable.
 | 21 | Published | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Published | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
-| 24 | Next extension | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
-| 25 | Extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
+| 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
+| 25 | Next extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. Three accepted extensions remain in
+The first essential edition is complete. Two accepted extensions remain in
 this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
