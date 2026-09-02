@@ -135,13 +135,19 @@ that it is not `BootCurrent`, and remove only that NVRAM variable:
 stale_bootnum=0003
 boot_current=$(sudo efibootmgr | awk '/BootCurrent:/ { print $2 }')
 printf 'BootCurrent=%s; candidate stale entry=%s\n' "$boot_current" "$stale_bootnum"
-if [ "$stale_bootnum" = "$boot_current" ]; then
-    printf 'Refusing to delete BootCurrent %s\n' "$boot_current"
-else
-    sudo efibootmgr --bootnum "$stale_bootnum" --delete-bootnum
-fi
+```
+
+Read the values. If they are equal, stop. If they differ and the candidate has
+already been proven to contain the obsolete PARTUUID, remove that exact entry
+and inspect the result:
+
+```bash
+sudo efibootmgr --bootnum "$stale_bootnum" --delete-bootnum
 sudo efibootmgr -v
 ```
+
+This separation keeps the safety decision visible to the operator instead of
+hiding it inside a multi-line shell conditional intended for a script.
 
 The deletion changes firmware NVRAM and normally removes the number from
 `BootOrder`; it does not delete the ESP, systemd-boot, or a UKI. That limited

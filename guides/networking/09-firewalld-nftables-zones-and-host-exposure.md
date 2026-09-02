@@ -206,6 +206,56 @@ Source-address bindings can classify traffic separately and rich rules can
 match particular sources, but they increase complexity. A source IP learned on
 a LAN is not a durable identity or authentication mechanism.
 
+## Home is a narrower policy, not blanket trust
+
+Firewalld orders its predefined zones by intended trust, but the friendly name
+does not attest the network or its devices. Their important operational
+difference is the resulting inbound policy:
+
+| Zone | Unmatched incoming traffic | Project use |
+| --- | --- | --- |
+| `public` | Rejected unless explicitly permitted | Default on every connection |
+| `home` | Rejected unless one of its selected services permits it | Candidate to inspect when a real LAN service is required |
+| `trusted` | Accepted | Not used on this laptop |
+
+The predefined `trusted` zone has target `ACCEPT`. Assigning a Wi-Fi profile to
+it is effectively a decision to accept arbitrary incoming connections from
+that network. WPA authentication protects access to the wireless network; it
+does not prove that every family, guest, IoT, router, or compromised device on
+the LAN is safe.
+
+The predefined `home` zone retains filtering, but its packaged service list is
+policy supplied by the distribution, not automatically this project's desired
+allowlist. Inspect both states before considering it:
+
+```bash
+sudo firewall-cmd --zone=home --list-all
+sudo firewall-cmd --permanent --zone=home --list-all
+sudo firewall-cmd --zone=trusted --list-all
+```
+
+If the laptop only initiates connections, `public` works at home without
+blocking web access, package downloads, Git, streaming, or replies. A separate
+home zone has a purpose only when a specific inbound feature is required, for
+example reviewed SSH administration, mDNS discovery, printing, or local file
+synchronization.
+
+At that point, treat the change as a small access-control design:
+
+1. identify the listening daemon, protocol, port, and required LAN clients;
+2. decide whether to review the packaged `home` zone or create a custom
+   restricted zone;
+3. enable only the required service and necessary client-network support;
+4. bind only the exact NetworkManager home connection profile;
+5. test the permission in runtime state before making it permanent;
+6. verify that university, hotspot, and unknown profiles still use `public`;
+7. remove the permission when the feature is retired.
+
+Creating a second zone with the same service list as `public` provides no new
+protection today. Giving it broader permissions before a service requires them
+violates least privilege. The canonical base therefore defers a home-specific
+zone until its first concrete inbound requirement.
+
 ## The default `public` zone
 
 Inspect runtime and permanent state side by side:
@@ -652,7 +702,7 @@ remote session will also disappear.
 | Backend | nftables | Current Linux packet-filter framework and firewalld default |
 | Standalone nftables unit | Disabled | Avoid competing lifecycle/ownership |
 | Default trust | `public` | Conservative for a roaming laptop |
-| Home trusted zone | Not created yet | “Home” does not make all LAN peers trusted |
+| Home-specific zone | Deferred until an inbound service requires it | A home label does not authenticate LAN peers; an empty duplicate adds no protection |
 | SSH opening | Removed | Client use needs no inbound exception; server is disabled |
 | DHCPv6 client | Retained | Permit required IPv6 client replies without exposing a general server |
 | ICMP | Required defaults retained | Preserve error handling, PMTU, and IPv6 control traffic |
@@ -667,6 +717,7 @@ remote session will also disappear.
 - [ArchWiki: firewalld](https://wiki.archlinux.org/title/Firewalld)
 - [ArchWiki: nftables](https://wiki.archlinux.org/title/Nftables)
 - [Firewalld concepts](https://firewalld.org/documentation/concepts.html)
+- [Firewalld predefined zones](https://firewalld.org/documentation/zone/predefined-zones.html)
 - [Connections, interfaces, and sources](https://firewalld.org/documentation/zone/connections-interfaces-and-sources.html)
 - [Runtime versus permanent](https://firewalld.org/documentation/configuration/runtime-versus-permanent.html)
 - [`firewall-cmd(1)`](https://man.archlinux.org/man/firewall-cmd.1)
