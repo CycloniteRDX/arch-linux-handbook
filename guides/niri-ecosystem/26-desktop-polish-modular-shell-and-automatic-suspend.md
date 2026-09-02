@@ -36,11 +36,11 @@ The project decision is now explicit:
   migration.
 
 This later decision supersedes the candidate status recorded in
-[guide 15](15-session-components-and-shell-evolution.md). DMS may still be
-present on a currently used machine because it was tested outside the tracked
-repositories. That installed state must be audited and removed or captured
-deliberately; the repositories remain the source of truth for the reproducible
-system.
+[guide 15](15-session-components-and-shell-evolution.md). DMS remains useful
+as a comparison, but it is not part of the selected installation or migration
+path. This guide assumes a clean Arch installation built through the runbook,
+post-install, and dotfiles repositories; it does not document cleanup of a
+previous desktop or shell.
 
 ## The selected architecture
 
@@ -621,10 +621,11 @@ non-secret asset set rather than reaching into the user's private home state.
 
 ### Candidate policy
 
-Because DMS is no longer the chosen shell, DankGreeter is not adopted merely
-for brand consistency. If it is already installed, audit it independently:
+A graphical frontend is selected on its own merits rather than because it is
+bundled with a particular shell. Every candidate requires an independent
+review of:
 
-- package or installer provenance;
+- package and update provenance;
 - modified files and services;
 - greetd command and PAM service;
 - greeter-user permissions;
@@ -731,23 +732,24 @@ helpers are easier to test and replace.
 
 ## Selected implementation order
 
-### Phase 0 — reconcile the real machine with Git
+### Phase 0 — establish the clean modular baseline
 
 Before adding visual changes:
 
-1. inventory DMS, DankGreeter, Quickshell, user units, XDG autostart entries,
-   Niri startup commands, and external package repositories on the current
-   machine;
-2. identify which state came from the DMS installer;
-3. preserve screenshots or settings only if they inform the desired design;
-4. remove DMS through its documented path without deleting unrelated Niri
-   configuration;
-5. decide independently whether the currently installed DankGreeter is kept
-   for testing or rolled back to tuigreet;
-6. verify the modular baseline and TTY recovery again.
+1. complete the reviewed runbook and post-install path without adding a
+   complete third-party shell;
+2. deploy the independent Niri, Waybar, Fuzzel, Mako, wallpaper, swaylock, and
+   Kitty Stow packages;
+3. verify that Niri starts each selected session component exactly once;
+4. prove manual `niri-session`, tuigreet login, logout, TTY3 recovery, locking,
+   monitor power, and manual suspend;
+5. confirm that the three repositories are clean and synchronized;
+6. record this state as the known-good baseline for later component
+   replacements.
 
-Do not use broad recursive deletion of `~/.config`, `~/.local`, or systemd
-directories. Resolve every owned file and unit first.
+The clean installation should not use a broad shell installer as an
+intermediate step. Every later package and configuration file is introduced by
+the phase that owns it, so Git history explains how the desktop was assembled.
 
 ### Phase 1 — visual foundation
 
@@ -801,8 +803,7 @@ This produces a coherent desktop before changing protocol owners.
 
 ### Phase 6 — graphical greeter and post-logout idle
 
-1. compare the current DankGreeter state, Noctalia Greeter, and other maintained
-   greetd frontends;
+1. compare Noctalia Greeter and other maintained greetd frontends;
 2. preserve tuigreet and TTY3 recovery;
 3. deploy system-readable theme assets;
 4. prove login, keyring unlock, logout return, and repeated sessions;
@@ -921,8 +922,8 @@ Never “repair” a themed greeter by enabling autologin or weakening PAM.
 ## Decisions recorded by this guide
 
 - Niri plus independently selected components is the chosen long-term desktop.
-- DMS is rejected as the target shell and will be removed through an audited,
-  non-destructive reconciliation.
+- DMS is rejected as the target shell and is not part of the clean installation
+  or migration path.
 - Noctalia remains a design reference and future comparison, not a dependency.
 - The existing Waybar/Fuzzel/Mako/swaybg/swaylock/swayidle stack remains the
   reproducible recovery baseline while the modular desktop evolves.
