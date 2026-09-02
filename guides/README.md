@@ -49,6 +49,11 @@ only when its first reviewed article is ready.
   graphical LUKS requests, KMS and SimpleDRM, quiet versus splash, distinct
   graphical and textual UKIs, themes, signing, testing, diagnosis, and
   recovery.
+- [TPM2-bound LUKS unlock, measured-boot policy, and recovery](boot-and-trust/25-tpm2-bound-luks-unlock-measured-boot-and-recovery.md)
+  separates Secure Boot, measured boot, TPM sealing, LUKS, and login; it
+  explains PCRs, signed PCR 11 policy, PCR 7, PIN and fallback credentials,
+  UKI policy signatures, updates, enrollment staging, diagnosis, rollback,
+  and recovery.
 
 ### Storage
 
@@ -143,10 +148,10 @@ recoverable.
 | 22 | Published | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
-| 25 | Next extension | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
-| 26 | Extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
+| 25 | Published | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
+| 26 | Next extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. Two accepted extensions remain in
+The first essential edition is complete. One accepted extension remains in
 this map.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
