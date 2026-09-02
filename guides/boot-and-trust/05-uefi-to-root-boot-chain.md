@@ -88,6 +88,67 @@ Do not delete unfamiliar EFI entries merely because they are old or duplicated.
 An entry may belong to recovery media, Windows, another disk, or an earlier
 installation. Identify its disk, partition GUID, and file path first.
 
+### Why two entries can have the same name
+
+`Linux Boot Manager` is only a human-readable label stored in a UEFI NVRAM
+variable. It is not a unique identifier. Each `Boot####` variable also records
+a device path similar to:
+
+```text
+HD(1,GPT,<ESP-PARTUUID>,...)/File(\EFI\systemd\systemd-bootx64.efi)
+```
+
+Repartitioning a disk creates a new GPT partition GUID even when the new ESP
+uses the same disk, partition number, mount point, label, and loader path as the
+old one. Firmware can therefore retain an obsolete `Linux Boot Manager` entry
+for the previous PARTUUID while `bootctl install` or `efibootmgr --create`
+adds a second entry with the same visible label for the new ESP.
+
+The identifiers involved are not interchangeable:
+
+| Identifier | Names | Used for |
+| --- | --- | --- |
+| GPT partition GUID | `PARTUUID`, GUID inside `HD(...,GPT,...)` | Let a UEFI boot variable identify the ESP partition. |
+| FAT filesystem identifier | `UUID` of `/dev/nvme0n1p1` | Mount the ESP from Linux, commonly through `/etc/fstab`. |
+| LUKS2 UUID | `cryptsetup luksUUID` | Select the encrypted container in `rd.luks.name=` and `rd.luks.options=`. |
+| Boot-variable number | `Boot0003`, for example | Identify one NVRAM record for ordering or deletion. |
+
+Compare the entry with the partition identity instead of comparing labels:
+
+```bash
+sudo efibootmgr -v
+lsblk -no PARTUUID,UUID,FSTYPE,MOUNTPOINTS /dev/nvme0n1p1
+sudo bootctl --print-loader-path
+```
+
+`BootCurrent` in the `efibootmgr` output identifies the NVRAM record used for
+the current boot. The canonical entry contains the current ESP PARTUUID and
+the normal systemd-boot path. If a new entry has just been created, boot
+through it once before removing its predecessor; otherwise `BootCurrent`
+cannot yet prove that the new record works.
+
+After that successful boot, a record is stale only when its exact disk or GPT
+partition GUID is known to be obsolete. Record its four-digit number, verify
+that it is not `BootCurrent`, and remove only that NVRAM variable:
+
+```bash
+stale_bootnum=0003
+boot_current=$(sudo efibootmgr | awk '/BootCurrent:/ { print $2 }')
+printf 'BootCurrent=%s; candidate stale entry=%s\n' "$boot_current" "$stale_bootnum"
+if [ "$stale_bootnum" = "$boot_current" ]; then
+    printf 'Refusing to delete BootCurrent %s\n' "$boot_current"
+else
+    sudo efibootmgr --bootnum "$stale_bootnum" --delete-bootnum
+fi
+sudo efibootmgr -v
+```
+
+The deletion changes firmware NVRAM and normally removes the number from
+`BootOrder`; it does not delete the ESP, systemd-boot, or a UKI. That limited
+scope makes an accidental deletion recoverable by recreating the entry or
+using the signed fallback loader, but it can still make another installation
+temporarily harder to start. Inspection therefore precedes deletion.
+
 ## The EFI System Partition
 
 UEFI firmware must be able to read the executable before Linux, LUKS, LVM, and
@@ -639,6 +700,7 @@ large “make boot better” step.
 - [systemd-boot(7)](https://man.archlinux.org/man/systemd-boot.7)
 - [systemd-stub(7)](https://man.archlinux.org/man/systemd-stub.7)
 - [bootctl(1)](https://man.archlinux.org/man/bootctl.1)
+- [efibootmgr(8)](https://man.archlinux.org/man/efibootmgr.8)
 - [loader.conf(5)](https://man.archlinux.org/man/loader.conf.5)
 - [kernel-command-line(7)](https://man.archlinux.org/man/kernel-command-line.7)
 - [mkinitcpio(8)](https://man.archlinux.org/man/mkinitcpio.8)

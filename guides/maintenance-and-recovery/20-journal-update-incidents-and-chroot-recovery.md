@@ -353,6 +353,57 @@ warnings. Record why a recurring message is understood, the package and kernel
 versions where it was observed, and which functional test proves it
 non-blocking. Do not suppress it merely to produce clean output.
 
+### Classify recurring platform messages before changing the system
+
+This workstation profile can expose messages whose journal priority is more
+alarming than their functional effect. Classify the exact text, the affected
+subsystem, and a real hardware test separately.
+
+The kernel line below is currently a probing artifact on systems without Intel
+Trust Domain Extensions, including AMD machines:
+
+```text
+virt/tdx: TDX not supported by the host platform
+```
+
+An upstream kernel patch describes absence of that feature as a normal state
+and removes the error-level message. On this AMD workstation, do not add a
+kernel blacklist or command-line workaround solely to silence it. Record the
+kernel version and re-evaluate after normal kernel updates.
+
+These two lines have also been reported on the same ThinkPad generation:
+
+```text
+Serial bus multi instantiate pseudo device driver INT3515:00: error -ENXIO: IRQ index 1 not found
+Serial bus multi instantiate pseudo device driver INT3515:00: error -ENXIO: Error requesting irq at index 1
+```
+
+That matching report does not prove the firmware cause or make every related
+failure harmless. If the local text is identical, first test USB-C charging,
+USB-C data, external display output, suspend, and resume, and keep firmware
+current through the manual policy in post-install chapter 06. If those
+functions work and the message occurs only during device discovery, record it
+as a known platform warning for the tested kernel and firmware versions. Do
+not suppress the driver message.
+
+Wi-Fi messages require stricter correlation. `wlp3s0` and any associated P2P
+interface can appear in the same boot, but a P2P setup failure is not evidence
+that the primary connection failed, and a working connection is not evidence
+that repeated authentication or roaming failures are irrelevant. Capture the
+complete messages and both supervising layers:
+
+```bash
+sudo journalctl -b _COMM=wpa_supplicant --no-pager
+sudo journalctl -b -u NetworkManager.service -u wpa_supplicant.service --no-pager
+nmcli general status
+nmcli device status
+lspci -nnk | grep -A3 -i 'network'
+```
+
+Then compare their timestamps with an observed disconnect, failed association,
+missing network, or successful continuous connection. Do not change the Wi-Fi
+backend, disable P2P, or mask a unit from an isolated priority-filtered line.
+
 ## The recurring maintenance cadence
 
 Arch requires regular operator attention, not unattended upgrades. The cadence
@@ -389,6 +440,22 @@ fixed calendar day.
 `checkupdates` is informational. No output with exit status `2` means no
 updates are available. It neither replaces Arch News nor authorizes partial
 package installation.
+
+`checkupdates` is shipped by `pacman-contrib`, but its isolated database
+operation also uses `fakeroot`. Arch records that helper as an optional
+dependency because the same package contains tools that do not need it;
+optional dependencies are reported during installation but are not selected
+automatically. Verify both parts when the command reports that it cannot find
+the fakeroot binary:
+
+```bash
+pacman -Q pacman-contrib fakeroot
+```
+
+The `base-devel` group also brings in `fakeroot`, along with the complete
+standard Arch package-building toolchain. Installing the whole group is correct
+when building repository or AUR packages. Installing only `fakeroot` is the
+smaller and clearer fix when the sole requirement is `checkupdates`.
 
 ### During the upgrade
 
@@ -1164,6 +1231,10 @@ defined. A job that runs silently is not a maintenance policy.
 - [`pacman(8)`](https://man.archlinux.org/man/pacman.8)
 - [`pacdiff(8)`](https://man.archlinux.org/man/pacdiff.8.en)
 - [`checkupdates(8)`](https://man.archlinux.org/man/checkupdates.8.en)
+- [Arch package: pacman-contrib](https://archlinux.org/packages/extra/x86_64/pacman-contrib/)
+- [Arch package: fakeroot](https://archlinux.org/packages/core/x86_64/fakeroot/)
+- [Linux kernel patch: do not print a TDX error when the feature is absent](https://lkml.rescloud.iu.edu/hypermail/linux/kernel/2607.3/10104.html)
+- [Arch forum hardware report: INT3515 on ThinkPad T14s Gen 1 AMD](https://bbs.archlinux.org/viewtopic.php?id=293342)
 - [`paccache(8)`](https://man.archlinux.org/man/paccache.8.en)
 - [`arch-chroot(8)`](https://man.archlinux.org/man/arch-chroot.8.en)
 - [`mkinitcpio(8)`](https://man.archlinux.org/man/mkinitcpio.8.en)
