@@ -116,6 +116,11 @@ only when its first reviewed article is ready.
   explains connectors and display identity, modes and refresh rates, physical
   versus logical pixels, fractional scaling, coordinates, hot-plug, lid
   behavior, workspace migration, and a portable per-ThinkPad override design.
+- [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
+  selects a personal modular Niri desktop, separates themes, icons, cursors,
+  wallpapers, notifications, widgets, locking, greeters, and idle ownership,
+  and defines the reversible path toward SwayNC, Eww, improved locking, and
+  battery-aware automatic suspend.
 
 ### Maintenance and recovery
 
@@ -149,10 +154,9 @@ recoverable.
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Published | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
-| 26 | Next extension | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
+| 26 | Published | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
 
-The first essential edition is complete. One accepted extension remains in
-this map.
+The first essential edition and all six accepted extensions are complete.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
