@@ -251,9 +251,8 @@ path. Do not use `pacman -Sy` alone, routine `-Syyu`, `--noconfirm`,
 ### AUR boundary
 
 After optional post-install chapter 16, Paru is the selected convenience
-client, but it does not turn the AUR into a trusted binary repository. Until
-that chapter is complete, the AUR workflow remains manual and review-led. The
-safe recurring inventory is:
+client. It does not turn the AUR into a trusted binary repository. Inventory
+foreign packages and pending AUR recipe versions with:
 
 ```bash
 pacman -Qm
@@ -293,6 +292,20 @@ procedure. Never run `makepkg` as root, enable `SkipReview`, or run
 `sudo paru`. Never assume `sudo pacman -Syu` updates foreign packages. Use
 the complete chapter 16 procedure for first installation, PGP failures,
 rebuilds, cache decisions, and recovery.
+
+Keep `~/Builds/aur/paru` as the reviewed manual recovery clone. It is not a
+duplicate installation and should not be removed during routine cleanup. If a
+validated `makepkg -Csri` build left temporary work behind, inspect and move
+only `src/` and `pkg/` to Trash:
+
+```bash
+cd ~/Builds/aur/paru
+du -sh src pkg 2>/dev/null
+gio trash ./src ./pkg
+```
+
+Future manual builds use `makepkg -Ccsri`: capital `-C` cleans before the build
+and lowercase `-c` cleans after a successful build.
 
 ## Files, paths, searching, and disk space
 
@@ -1188,9 +1201,6 @@ actual fault and construct a bounded recovery operation.
 - [Arch manual: paccache(8)](https://man.archlinux.org/man/paccache.8.en)
 - [Arch manual: pacdiff(8)](https://man.archlinux.org/man/pacdiff.8.en)
 - [Paru upstream manual](https://github.com/Morganamilo/paru/blob/master/man/paru.8)
-- [Arch manual: checkupdates(8)](https://man.archlinux.org/man/checkupdates.8.en)
-- [Arch manual: paccache(8)](https://man.archlinux.org/man/paccache.8.en)
-- [Arch manual: pacdiff(8)](https://man.archlinux.org/man/pacdiff.8.en)
 - [Arch manual: gio(1)](https://man.archlinux.org/man/gio.1.en)
 - [NetworkManager: nmcli examples](https://networkmanager.dev/docs/api/latest/nmcli-examples.html)
 - [Arch manual: bluetoothctl(1)](https://man.archlinux.org/man/bluetoothctl.1.en)

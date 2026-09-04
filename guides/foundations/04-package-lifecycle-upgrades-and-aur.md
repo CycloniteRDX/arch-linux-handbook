@@ -412,7 +412,8 @@ does not change the following rules:
 - make it show PKGBUILD changes before building;
 - do not allow unattended confirmation of arbitrary recipes;
 - distinguish official upgrades from AUR rebuilds in logs and diagnosis;
-- retain a recovery path that does not depend on the helper itself.
+- retain the reviewed `~/Builds/aur/paru` Git clone as a recovery path that
+  does not depend on the helper itself.
 
 The project keeps maintenance in two explicit phases:
 
