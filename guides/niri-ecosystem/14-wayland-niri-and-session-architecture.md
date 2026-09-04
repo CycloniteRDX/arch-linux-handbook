@@ -691,7 +691,7 @@ operate the current desktop:
 - design host-specific output overrides after measuring both ThinkPads;
 - move selected long-running clients to reviewed systemd user units if restart
   policy or dependency ordering becomes necessary;
-- evolve tuigreet to a graphical greeter without sacrificing TTY recovery;
+- preserve tuigreet and its independent TTY recovery path;
 - add Plymouth only after its initramfs, encryption-prompt, Secure Boot, update,
   and recovery implications are documented;
 - add themes, icon packs, cursor policy, and an actual wallpaper asset;

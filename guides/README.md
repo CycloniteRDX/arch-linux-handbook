@@ -118,9 +118,9 @@ only when its first reviewed article is ready.
   behavior, workspace migration, and a portable per-ThinkPad override design.
 - [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
   selects a personal modular Niri desktop, separates themes, icons, cursors,
-  wallpapers, notifications, widgets, locking, greeters, and idle ownership,
-  and defines the reversible path toward SwayNC, Eww, improved locking, and
-  battery-aware automatic suspend.
+  wallpapers, notifications, widgets, locking, the stable tuigreet boundary,
+  and idle ownership; it defines the reversible path toward SwayNC, Eww,
+  improved locking, and battery-aware automatic suspend.
 
 ### Maintenance and recovery
 
@@ -133,12 +133,16 @@ only when its first reviewed article is ready.
   connects bounded journal queries, package transactions, boot stages, TTY and
   ISO escalation, mounted-system inspection, chroot repair, offline ext4
   diagnosis, incident records, and the recurring maintenance cadence.
+- [Daily and occasional command cheatsheet](maintenance-and-recovery/27-daily-and-occasional-command-cheatsheet.md)
+  provides the compact operating reference for packages, Trash, files, Wi-Fi,
+  Bluetooth, audio, TLP profiles, suspend, services, logs, removable media,
+  backups, Git, Niri, and recurring maintenance.
 
 ## Current roadmap
 
 Guides 01 through 20 now form the first essential edition: the handbook
 explains every major subsystem needed to operate, diagnose, maintain, and
-recover the installed workstation. Guides 21 through 26 are accepted
+recover the installed workstation. Guides 21 through 27 are accepted
 extensions, but the system does not depend on them to be understandable or
 recoverable.
 
@@ -154,9 +158,10 @@ recoverable.
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Published | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
-| 26 | Published | Themes, icons, cursors, wallpapers, improved greeter/locker/notifications, automatic suspend, and the modular-shell decision. |
+| 26 | Published | Themes, icons, cursors, wallpapers, modular desktop polish, the stable tuigreet boundary, and automatic suspend. |
+| 27 | Published | Daily and occasional command reference for operating and maintaining the validated workstation. |
 
-The first essential edition and all six accepted extensions are complete.
+The first essential edition and all seven accepted extensions are complete.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
@@ -195,7 +200,8 @@ numbers:
    model; GitHub and SSH authentication; deliberate publication and recovery.
 6. **Maintenance and extensions:** Restic and restore drills; journal-led
    diagnosis and chroot recovery; update workflow; printing and peripherals;
-   Plymouth and boot appearance; TPM2-bound unlock; theming and desktop polish.
+   Plymouth and boot appearance; TPM2-bound unlock; theming and desktop polish;
+   the daily and occasional command reference.
 
 This backlog may grow when a runbook or post-install instruction relies on a
 concept that deserves an explanation of its own.

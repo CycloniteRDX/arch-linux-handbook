@@ -49,9 +49,9 @@ This yields one durable rule:
 > A greeter presents a login; PAM authenticates it; logind records it; the
 > session command builds the desktop.
 
-Replacing one layer does not automatically replace the others. A future
-graphical greeter can retain greetd, PAM, logind, and `niri-session`. Changing
-the lock screen does not change how a new login is created.
+Replacing one layer does not automatically replace the others. Changing the
+lock screen does not change how a new login is created, and restyling the user
+session does not require replacing tuigreet.
 
 ## Current project contract
 
@@ -513,38 +513,17 @@ The planned automatic idle sequence is lock, then monitors off, then suspend.
 It will not call Niri's quit action. Logout would discard application state and
 is not an acceptable substitute for power management.
 
-## A future graphical greeter
+## Why tuigreet remains selected
 
 tuigreet is intentionally conservative: it depends on the Linux console, is
 easy to inspect, and does not require a Wayland compositor merely to display a
-login. Its visual limits are also real.
+login. Its smaller visual scope is accepted because login reliability, PAM
+clarity, repeated-session behavior, and TTY recovery matter more than matching
+the user-session theme.
 
-A future graphical greeter can improve typography, background, layout,
-accessibility, and integration with a chosen shell. That is a presentation
-migration, not permission to blur the login architecture.
-
-Any candidate must be evaluated against this contract:
-
-| Requirement | Reason |
-| --- | --- |
-| Retain explicit password login | Avoid autologin and preserve keyring unlock |
-| Continue through a reviewed PAM service | Keep authentication policy inspectable |
-| Start `niri-session` | Preserve the supported Niri lifecycle |
-| Run its UI unprivileged | Limit the presentation process |
-| Keep TTY3 functional | Preserve recovery when graphics or themes fail |
-| Avoid a second display manager | Prevent VT and login ownership conflicts |
-| Avoid passwordless sudo rules | Presentation must not weaken system policy |
-| Test logout back to the greeter | Prove the complete repeated-session lifecycle |
-
-A graphical greeter has a wider failure surface than tuigreet: GPU setup,
-Wayland protocols, fonts, themes, shell libraries, and configuration can all
-fail before login. This is not a reason to reject it; it is a reason to retain
-the independent TTY recovery path and migrate one layer at a time.
-
-Complete shells such as DMS or Noctalia may provide their own visual greeter
-story. If one is selected later, the project will first decide which process
-owns the greeter presentation and which current components it replaces. It
-will not stack multiple greeters or display managers permanently.
+This project therefore keeps tuigreet as the selected presentation. It does
+not stack another greeter or display manager over greetd, and no greeter
+migration is part of the current roadmap.
 
 Plymouth is unrelated to this boundary. It can improve the earlier boot and
 encrypted-root presentation, but it ends before the user login manager takes
@@ -888,9 +867,8 @@ upgrade, and TTY recovery tests.
   enabled as a parallel manager.
 - Logging out of Niri returns to tuigreet; locking and suspending do not log
   out.
-- A future graphical greeter may replace tuigreet's presentation only after
-  preserving PAM, `niri-session`, password login, repeated-session behavior,
-  and TTY recovery.
+- tuigreet remains the selected presentation and is not an active migration
+  target.
 - Plymouth and TPM2 unlock remain separate early-boot projects.
 
 ## Completion checklist
