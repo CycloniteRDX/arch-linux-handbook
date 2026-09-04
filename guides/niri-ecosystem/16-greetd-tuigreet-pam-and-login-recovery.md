@@ -386,6 +386,37 @@ must not convert an otherwise valid local account into an unusable account.
 This does not make password authentication optional: the base Arch stack still
 contains the decisive authentication modules.
 
+### Read the complete gkr-pam transaction
+
+`systemctl status greetd.service` combines recent messages from more than one
+PAM transaction. In the project configuration it can show both the technical
+`greeter` session and the later `neon` session. Red coloring reflects the
+message priority chosen by the component; it does not, by itself, prove that
+the final user login or keyring unlock failed.
+
+A successful field-tested sequence can look like this:
+
+| Context | Representative message | Meaning |
+| --- | --- | --- |
+| `user greeter` | `gkr-pam: couldn't unlock the login keyring` | The unprivileged presentation account has no user login keyring to unlock. |
+| `neon` authentication | `gkr-pam: unable to locate daemon control file` | The target user's keyring daemon does not exist yet at this early PAM phase. |
+| `neon` authentication | `gkr-pam: stashed password to try later in open session` | PAM retained the already-entered login token within the transaction. |
+| `neon` session | `pam_unix(greetd:session): session opened for user neon` | The authenticated target-user session is opening. |
+| `neon` session | `gkr-pam: unlocked login keyring` | The session hook started or found the daemon and successfully unlocked the collection. |
+
+The middle `unable to locate` line is therefore not evaluated in isolation.
+The GNOME Keyring PAM module first tries the existing daemon, can retain the
+password when none exists, and its `auto_start` session hook tries again after
+the user session is initialized. The decisive evidence is the final unlock
+message plus a functional Secret Service operation without a second password
+prompt.
+
+Inspect the related lines together:
+
+```bash
+sudo journalctl -b -u greetd.service --no-pager | grep -E 'user (greeter|neon)|gkr-pam'
+```
+
 The password-change integration remains in `/etc/pam.d/passwd`:
 
 ```pam
@@ -420,7 +451,17 @@ journalctl -b --no-pager | grep -Ei 'gkr-pam|gnome-keyring|greetd'
 
 A running Secret Service does not prove the login collection unlocked. The
 practical test is to log in through tuigreet and use an application that stores
-a secret without receiving an unexpected second login-keyring prompt.
+a secret without receiving an unexpected second login-keyring prompt. A safe
+test uses a disposable value and removes it immediately:
+
+```bash
+printf '%s' 'temporary-test-secret' | secret-tool store \
+    --label='Arch post-install verification' \
+    project arch-post-install \
+    purpose verification
+secret-tool lookup project arch-post-install purpose verification
+secret-tool clear project arch-post-install purpose verification
+```
 
 ## Login, unlock, authorization, and disk unlock
 
@@ -612,8 +653,10 @@ version it represents.
 1. Review the TOML and PAM diff before restarting anything.
 2. Confirm a second TTY login still succeeds.
 3. Validate the Niri configuration.
-4. End the current graphical session deliberately.
-5. Start or restart greetd from the recovery TTY.
+4. Return to the original Niri session, save work, and exit the compositor
+   deliberately.
+5. Confirm from the recovery TTY that `pgrep -a niri` prints nothing, then
+   start or restart greetd.
 6. Enter one deliberately wrong password and confirm rejection.
 7. Enter the correct password and confirm Niri starts.
 8. Confirm keyring unlock, session properties, and user services.
@@ -621,6 +664,12 @@ version it represents.
 10. Exit Niri and verify that tuigreet returns.
 11. Log in a second time to test the repeated lifecycle.
 12. Reboot only after every live test passes.
+
+Do not leave the original Niri compositor running merely because the recovery
+TTY is available. greetd may successfully display tuigreet on VT1 while the
+subsequent login still fails to start another Niri session for the same user.
+The recovery shell protects the procedure; it is not a replacement for ending
+the old graphical session before testing the new login owner.
 
 Useful pre-reboot checks are:
 
@@ -879,6 +928,7 @@ upgrade, and TTY recovery tests.
 - [loginctl(1)](https://man.archlinux.org/man/loginctl.1.en)
 - [systemd.special(7)](https://man.archlinux.org/man/systemd.special.7.en)
 - [GNOME Keyring PAM integration](https://wiki.gnome.org/Projects/GnomeKeyring/Pam)
+- [GNOME Keyring PAM module source](https://github.com/GNOME/gnome-keyring/blob/main/pam/gkr-pam-module.c)
 - [Niri `niri-session` implementation](https://github.com/YaLTeR/niri/blob/main/resources/niri-session)
 - [Niri example systemd setup](https://niri-wm.github.io/niri/Example-systemd-Setup.html)
 
