@@ -18,8 +18,8 @@ only when its first reviewed article is ready.
   sockets, timers, targets, user managers, generators, logs, and recovery.
 - [Package lifecycle, upgrades, and the AUR](foundations/04-package-lifecycle-upgrades-and-aur.md)
   explains pacman transactions, package state and queries, complete upgrades,
-  configuration merges, cache, mirrors, foreign packages, AUR review, and
-  recovery.
+  configuration merges, cache, mirrors, foreign packages, AUR review, the
+  optional Paru workflow, and recovery.
 - [Shell, terminal, paths, redirection, editors, and
   documentation](foundations/21-shell-terminal-paths-and-documentation.md)
   distinguishes terminal and shell layers and explains Bash parsing, paths,

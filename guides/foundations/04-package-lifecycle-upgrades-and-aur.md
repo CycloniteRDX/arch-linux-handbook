@@ -402,8 +402,10 @@ An AUR helper can automate searching, fetching, dependency resolution,
 rebuilding, and installation. It cannot decide whether a new build recipe or
 changed source is trustworthy.
 
-The project therefore does not install a helper pre-emptively. Learn one manual
-build and review cycle first. If a helper is later selected:
+The stable workstation baseline therefore does not install a helper
+pre-emptively. Optional post-install chapter 16 first teaches one manual build
+and review cycle, then selects Paru as the convenience client. That selection
+does not change the following rules:
 
 - understand when it refreshes official databases and ensure upgrades remain
   complete;
@@ -411,6 +413,19 @@ build and review cycle first. If a helper is later selected:
 - do not allow unattended confirmation of arbitrary recipes;
 - distinguish official upgrades from AUR rebuilds in logs and diagnosis;
 - retain a recovery path that does not depend on the helper itself.
+
+The project keeps maintenance in two explicit phases:
+
+```bash
+sudo pacman -Syu
+sudo pacdiff --output
+paru -Sua --review --upgrademenu --removemake=ask
+```
+
+The official transaction finishes before AUR recipes are rebuilt. The project
+does not use bare `paru` as its routine command, even though upstream defines it
+as a shortcut for `paru -Syu`; spelling out the phases keeps their different
+trust and failure boundaries visible.
 
 Popularity and votes indicate usage, not safety. A valid upstream signature
 can authenticate a source release but does not validate every command in the
@@ -544,3 +559,5 @@ The project automates conservative cache cleanup, not package upgrade approval.
 - [ArchWiki: Reflector](https://wiki.archlinux.org/title/Reflector)
 - [ArchWiki: Arch User Repository](https://wiki.archlinux.org/title/Arch_User_Repository)
 - [ArchWiki: Makepkg](https://wiki.archlinux.org/title/Makepkg)
+- [Paru upstream README](https://github.com/Morganamilo/paru)
+- [Paru upstream manual](https://github.com/Morganamilo/paru/blob/master/man/paru.8)

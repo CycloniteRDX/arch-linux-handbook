@@ -452,8 +452,8 @@ the fakeroot binary:
 pacman -Q pacman-contrib fakeroot
 ```
 
-The `base-devel` group also brings in `fakeroot`, along with the complete
-standard Arch package-building toolchain. Installing the whole group is correct
+The `base-devel` metapackage also brings in `fakeroot`, along with the complete
+standard Arch package-building toolchain. Installing the metapackage is correct
 when building repository or AUR packages. Installing only `fakeroot` is the
 smaller and clearer fix when the sole requirement is `checkupdates`.
 
