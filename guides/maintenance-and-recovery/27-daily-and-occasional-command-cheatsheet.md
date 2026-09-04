@@ -251,8 +251,9 @@ path. Do not use `pacman -Sy` alone, routine `-Syyu`, `--noconfirm`,
 ### AUR boundary
 
 After optional post-install chapter 16, Paru is the selected convenience
-client. It does not turn the AUR into a trusted binary repository. Inventory
-foreign packages and pending AUR recipe versions with:
+client, but it does not turn the AUR into a trusted binary repository. Until
+that chapter is complete, the AUR workflow remains manual and review-led. The
+safe recurring inventory is:
 
 ```bash
 pacman -Qm
@@ -286,9 +287,10 @@ sudo pacdiff --output
 paru -Sua --review --upgrademenu --removemake=ask
 ```
 
-For each foreign package, identify its source and review the `PKGBUILD` changes
-since the installed build. Never run `makepkg` as root, enable `SkipReview`, or
-run `sudo paru`. Never assume `sudo pacman -Syu` updates foreign packages. Use
+For each foreign package, identify its source, review the current `PKGBUILD`
+and changes since the installed build, then use the full documented build
+procedure. Never run `makepkg` as root, enable `SkipReview`, or run
+`sudo paru`. Never assume `sudo pacman -Syu` updates foreign packages. Use
 the complete chapter 16 procedure for first installation, PGP failures,
 rebuilds, cache decisions, and recovery.
 
@@ -1186,6 +1188,9 @@ actual fault and construct a bounded recovery operation.
 - [Arch manual: paccache(8)](https://man.archlinux.org/man/paccache.8.en)
 - [Arch manual: pacdiff(8)](https://man.archlinux.org/man/pacdiff.8.en)
 - [Paru upstream manual](https://github.com/Morganamilo/paru/blob/master/man/paru.8)
+- [Arch manual: checkupdates(8)](https://man.archlinux.org/man/checkupdates.8.en)
+- [Arch manual: paccache(8)](https://man.archlinux.org/man/paccache.8.en)
+- [Arch manual: pacdiff(8)](https://man.archlinux.org/man/pacdiff.8.en)
 - [Arch manual: gio(1)](https://man.archlinux.org/man/gio.1.en)
 - [NetworkManager: nmcli examples](https://networkmanager.dev/docs/api/latest/nmcli-examples.html)
 - [Arch manual: bluetoothctl(1)](https://man.archlinux.org/man/bluetoothctl.1.en)
