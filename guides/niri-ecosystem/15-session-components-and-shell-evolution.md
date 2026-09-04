@@ -1,4 +1,4 @@
-# Waybar, Fuzzel, Mako, Eww, and shell evolution
+# Waybar, Fuzzel, Mako, Eww, and modular desktop evolution
 
 ## Purpose and scope
 
@@ -21,8 +21,8 @@ path toward a more polished desktop. The accepted future goals are:
 - a richer notification experience than transient Mako popups alone;
 - automatic suspend after the session has first locked and then powered off
   its displays;
-- a later comparison with complete shells such as DankMaterialShell and
-  Noctalia.
+- continued visual refinement without surrendering the explicit component
+  boundaries.
 
 These are recorded design goals, not immediate configuration changes. The
 current daily-driver baseline remains canonical until each replacement passes
@@ -402,7 +402,6 @@ not merely because its package name is newer.
 | Restyled swaylock | Same trusted lifecycle; richer tracked colors or background | Lowest-risk option |
 | hyprlock | GPU-accelerated configurable labels, images, input fields, and effects | Leading visual candidate; recommended as a nicer locker by Niri upstream |
 | gtklock | GTK theme, CSS, XML layout, and loadable modules | Extensible GTK alternative in Arch Extra |
-| Shell-owned locker | Shared theme and controls with DMS or Noctalia | Evaluate only as part of the complete shell migration |
 
 Both hyprlock and gtklock are available from Arch's official Extra repository.
 Availability is not enough to approve either. A replacement must prove:
@@ -455,9 +454,9 @@ flowchart TD
     E["Activity before suspend"] --> F["Power monitors on"]
 ```
 
-The first two stages currently occur after five and ten idle minutes. The third
-stage is deliberately unspecified. It will use a timeout greater than the
-display-off timeout and request the high-level operation:
+The first two stages currently occur after five and ten idle minutes. The
+selected initial third stage is battery-only suspend after 30 idle minutes. It
+uses the high-level operation:
 
 ```bash
 systemctl suspend
@@ -470,19 +469,18 @@ Before implementation, the project must choose:
 
 | Decision | Why it matters |
 | --- | --- |
-| Third timeout | Balances battery protection against unwanted interruption |
-| Battery, AC, or both | A docked build and an unattended battery session have different risks |
-| Idle owner | swayidle, DMS, Noctalia, or another coordinator; exactly one |
+| Third timeout | 30 minutes on battery; long enough to avoid ordinary pauses |
+| AC policy | No automatic idle suspend initially; manual and lid suspend remain available |
+| Idle owner | swayidle; exactly one coordinator |
 | Wayland inhibitors | Browsers, games, presentations, and media may ask to remain active |
 | systemd inhibitors | Updates, backups, shutdown-sensitive jobs, and applications may block sleep |
 | User warning | A notification or visual countdown must occur early enough to be useful |
 | External displays | Docked use may look idle while serving another purpose |
 | Resume tests | Lock, displays, Wi-Fi, audio, Bluetooth, TLP, and input must recover |
 
-The command can be added to swayidle without replacing it, but only after the
-inhibitor and power-source policy is designed. A shell-owned idle service can
-also implement all three stages; in that case swayidle must be removed so two
-timers cannot race.
+The command can be added to swayidle only after the inhibitor and power-source
+checks are implemented. No second idle service is added; two timers could race
+to lock, blank, or suspend the session.
 
 Inspect inhibitors before and during long-running tests:
 
@@ -494,7 +492,7 @@ loginctl session-status
 Automatic suspend is not hibernation and does not require a resume image in
 swap. The existing no-hibernation policy remains unchanged.
 
-## Four evolution strategies
+## Two modular evolution strategies
 
 ### 1. Polish the current modular stack
 
@@ -515,8 +513,8 @@ Costs:
 - no single settings panel owns the whole desktop;
 - richer behavior may require small integrations between Waybar and SwayNC.
 
-This is the preferred next experiment after the current baseline has run long
-enough to establish reliable suspend, reminders, and session startup.
+This is the preferred long-term direction after the current baseline has run
+long enough to establish reliable suspend, reminders, and session startup.
 
 ### 2. Build selected surfaces with Eww
 
@@ -528,39 +526,6 @@ more maintenance responsibility into `niri-dotfiles`. It should begin with one
 bounded surface, not a simultaneous rewrite of bar, launcher, notifier, and
 lock screen.
 
-### 3. Adopt DankMaterialShell
-
-DankMaterialShell is a complete Wayland shell built around Quickshell. It can
-provide a bar, launcher, notification center, control center, wallpaper,
-lock screen, greeter integration, widgets, and idle behavior.
-
-Under Niri, DMS remains the shell; Niri remains the compositor. A DMS migration
-would retire overlapping startup entries rather than run DMS beside Waybar,
-Fuzzel, Mako, swaybg, and swaylock indefinitely.
-
-DMS also exposes power controls. The project must preserve TLP plus `tlp-pd` as
-the only power-profile provider. If a DMS widget does not recognize `tlp-pd`,
-the correct temporary result is an unavailable widget—not installing
-`power-profiles-daemon` over the selected TLP policy.
-
-### 4. Adopt Noctalia
-
-Current Noctalia provides a cohesive native Wayland shell layer including
-bars, launcher, notification center, wallpaper, lock screen, session actions,
-OSDs, widgets, and idle behaviors. It supports Niri integration and can own the
-complete lock → monitor-off → suspend sequence.
-
-Noctalia v5 is currently marked beta by its project. That may be appropriate
-for a future experiment, but the canonical repositories should not chase its
-configuration while the architecture is still changing. Re-evaluate the
-stable release, packaging source, migration format, Niri support, resource use,
-and rollback at the time of adoption.
-
-As with DMS, a Noctalia migration replaces overlapping pieces as a coherent
-transaction. It does not replace NetworkManager, PipeWire, WirePlumber, BlueZ,
-UDisks, TLP, firewalld, portals, or Niri merely because it presents controls
-for them.
-
 ## Comparison matrix
 
 | Approach | Visual coherence | Custom ownership | Moving parts exposed | Migration risk | Current decision |
@@ -568,14 +533,10 @@ for them.
 | Current modular stack | Moderate | Low to moderate | High and explicit | Already proven baseline | Keep canonical |
 | Polished modular stack | Moderate to high | Moderate | High and explicit | Low when changed one role at a time | Preferred next experiment |
 | Eww surfaces | Potentially very high | High | High and project-owned | Medium to high | Educational option, not selected |
-| DankMaterialShell | High | Lower per individual component | Consolidated behind one shell | High because several roles move together | Compare later |
-| Noctalia | High | Lower per individual component | Consolidated behind one shell | High; current v5 maturity must be rechecked | Compare after stabilization |
 
-“Fewer processes” is not automatically simpler. A complete shell can hide
-many services behind one process and one configuration model. Conversely,
-several small processes can be simpler to diagnose because their ownership is
-explicit. The useful comparison is operational responsibility, not process
-count alone.
+Process count is not the design target. Several small processes remain easy to
+diagnose when their ownership is explicit; the useful comparison is
+operational responsibility and maintenance cost.
 
 ## Safe replacement procedure
 
@@ -599,19 +560,9 @@ For a locker migration, manual lock/unlock must succeed before editing
 swayidle. Then every swayidle path—manual binding, idle timeout, logind lock,
 and `before-sleep`—is updated and tested together.
 
-For a complete shell migration, construct an ownership table first:
-
-| Existing role | Old owner | New owner | Old startup removed? | Verified? |
-| --- | --- | --- | --- | --- |
-| Bar | Waybar | Shell | Required | Pending |
-| Launcher | Fuzzel | Shell | Required | Pending |
-| Notifications | Mako | Shell | Required | Pending |
-| Background | swaybg | Shell | Required if shell owns it | Pending |
-| Lock | swaylock | Shell | Required if shell owns it | Pending |
-| Idle | swayidle | Shell or retained swayidle | Exactly one final owner | Pending |
-
 Do not remove portals, the polkit authorization mechanism, Secret Service, or
-system services merely because a shell draws replacement interfaces for them.
+system services merely because a new modular surface presents controls for
+them.
 
 ## Verification toolkit
 
@@ -703,8 +654,7 @@ the designed effect. Restore the reviewed values before committing.
 
 - Waybar, Fuzzel, Mako, swaylock, swayidle, and swaybg remain the canonical
   daily-driver baseline today.
-- A more polished modular setup is the preferred next experiment before a
-  complete shell migration.
+- A more polished modular setup is the selected long-term direction.
 - SwayNC is the leading modular candidate to replace Mako and add a persistent
   notification center.
 - hyprlock is the leading visual locker candidate; gtklock and a deeper
@@ -712,16 +662,13 @@ the designed effect. Restore the reviewed values before committing.
 - swayidle is not a visual component and can remain while the locker changes.
 - Future idle policy will lock, then power off monitors, then suspend after a
   third timeout; it will not log out.
-- The automatic-suspend timeout and AC/battery policy remain undecided.
+- The initial automatic-suspend policy is 30 minutes on battery only; automatic
+  suspend on AC remains disabled initially.
 - Eww can replace or add selected widgets but does not replace Mako, Fuzzel,
   swaylock, or system services without additional integration.
-- DMS and Noctalia are complete-shell candidates. If selected, they will
-  replace overlapping components as a coordinated migration rather than being
-  layered permanently over them.
-- TLP plus `tlp-pd` remains the power-profile stack regardless of which shell
-  presents its state.
+- TLP plus `tlp-pd` remains the only power-profile stack.
 - Plymouth remains a separate boot-presentation project and does not belong to
-  the user-session shell migration.
+  the user-session desktop-component work.
 
 ## Sources
 
@@ -742,11 +689,8 @@ the designed effect. Restore the reviewed values before committing.
 - [hyprlock documentation](https://wiki.hypr.land/Hypr-Ecosystem/hyprlock/)
 - [gtklock upstream](https://github.com/jovanlanik/gtklock)
 - [gtklock(1)](https://man.archlinux.org/man/gtklock.1.en)
-- [DankMaterialShell documentation](https://danklinux.com/docs/)
-- [Noctalia documentation](https://docs.noctalia.dev/noctalia/)
 
 ## Next guide
 
 Continue with greetd, tuigreet, PAM, session creation, screen locking, login
-failure recovery, and the future boundary between a terminal greeter and a
-graphical greeter.
+failure recovery, and the terminal-greeter recovery boundary.

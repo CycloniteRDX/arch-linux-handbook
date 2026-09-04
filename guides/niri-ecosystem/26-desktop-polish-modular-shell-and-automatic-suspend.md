@@ -28,17 +28,12 @@ in `niri-dotfiles`.
 The project decision is now explicit:
 
 - build a personal modular desktop around Niri;
-- discard DankMaterialShell as the target shell;
-- retain Noctalia only as a future reference while its current generation
-  matures;
 - keep the existing small components as a working recovery baseline;
 - replace one role at a time, with an ownership table and rollback for every
   migration.
 
-This later decision supersedes the candidate status recorded in
-[guide 15](15-session-components-and-shell-evolution.md). DMS remains useful
-as a comparison, but it is not part of the selected installation or migration
-path. This guide assumes a clean Arch installation built through the runbook,
+The project does not carry a complete-shell migration in its roadmap. This
+guide assumes a clean Arch installation built through the runbook,
 post-install, and dotfiles repositories; it does not document cleanup of a
 previous desktop or shell.
 
@@ -59,7 +54,7 @@ this project rather than a monolithic shell product.
 | Idle and pre-sleep coordination | swayidle | Keep while building automatic suspend |
 | Custom dashboard and widgets | None | Introduce Eww for one bounded surface at a time |
 | Login manager | greetd | Keep |
-| Login presentation | tuigreet | Keep as proven baseline; compare one graphical greetd frontend later |
+| Login presentation | tuigreet | Keep as the selected and proven frontend |
 | Hardware power policy | TLP plus `tlp-pd` | Keep; no shell may introduce a second provider |
 
 The table is a dependency contract, not merely a list of preferred programs.
@@ -258,7 +253,6 @@ Test the cursor over:
 - Kitty;
 - an XWayland application;
 - the locker;
-- the graphical greeter when one is eventually selected;
 - both internal and external displays at their real scales.
 
 ### Fonts and icon fonts
@@ -609,65 +603,17 @@ The second milestone must test the login screen, no active user session,
 remote or secondary sessions, inhibitors, and recovery. It will not be smuggled
 into the first swayidle change.
 
-## Greeter evolution
+## Keep tuigreet as the login presentation
 
-greetd remains the login manager. tuigreet remains the known-good frontend and
-TTY recovery baseline.
+greetd remains the login manager and tuigreet remains its selected frontend.
+The user-session theme does not need to extend into the login surface, whose
+small configuration and proven TTY recovery path are more valuable than visual
+uniformity.
 
-A graphical frontend may later improve wallpaper, typography, layout, and
-visual continuity. It does not replace greetd, PAM, logind, or `niri-session`.
-It must run as the unprivileged greeter account and use a system-readable,
-non-secret asset set rather than reaching into the user's private home state.
-
-### Candidate policy
-
-A graphical frontend is selected on its own merits rather than because it is
-bundled with a particular shell. Every candidate requires an independent
-review of:
-
-- package and update provenance;
-- modified files and services;
-- greetd command and PAM service;
-- greeter-user permissions;
-- session command;
-- update and removal path;
-- return after logout;
-- TTY recovery.
-
-Noctalia Greeter is a separate future candidate even if the full Noctalia
-shell is not adopted. Its current official documentation describes it as a
-greetd login screen with shared wallpaper, palette, and font support. It still
-requires the same local package, PAM, session, update, and rollback review.
-
-The graphical greeter is deliberately later than the user-session theme. A
-broken bar is inconvenient; a broken login surface can block the normal entry
-path.
-
-## Noctalia remains a reference, not a dependency
-
-Noctalia is useful as a design reference for cohesive bars, panels,
-notifications, lock screens, wallpaper theming, and settings UX. The project
-does not need to reproduce every feature.
-
-As of 2026-09-02, Noctalia's official sources are not fully aligned about v5
-maturity: the project landing page presents v5 as stable, while the repository
-README and latest GitHub release still identify the v5 series as beta. That
-disagreement is itself sufficient reason not to make it a reproducible
-dependency today.
-
-Re-evaluation is event-driven, not calendar-driven. It can occur when:
-
-- upstream release metadata consistently marks a stable generation;
-- Arch installation and update paths are clear;
-- Niri support covers the required outputs, workspaces, lock, and session
-  actions;
-- configuration migration and rollback are documented;
-- the project has a feature whose maintenance cost is genuinely lower in
-  Noctalia than in the chosen modular stack.
-
-Even then, comparison does not imply migration. The purpose of building the
-modular desktop now is to understand the boundaries and make later choices
-from experience.
+Any future reconsideration would be a separate security-sensitive project. It
+would have to preserve greetd, PAM, logind, the unprivileged greeter account,
+the `niri-session` command, return after logout, and TTY recovery. No graphical
+greeter change is part of the current roadmap.
 
 ## Repository design for the custom desktop
 
@@ -801,13 +747,13 @@ This produces a coherent desktop before changing protocol owners.
 7. restore and commit the reviewed timeouts;
 8. observe normal use before considering automatic suspend on AC.
 
-### Phase 6 — graphical greeter and post-logout idle
+### Phase 6 — post-logout idle with tuigreet
 
-1. compare Noctalia Greeter and other maintained greetd frontends;
-2. preserve tuigreet and TTY3 recovery;
-3. deploy system-readable theme assets;
+1. retain the current greetd and tuigreet configuration;
+2. preserve TTY3 recovery;
+3. verify which idle state the greeter session reports to logind;
 4. prove login, keyring unlock, logout return, and repeated sessions;
-5. only then design automatic suspend while the greeter is idle.
+5. only then decide whether post-logout automatic suspend is justified.
 
 ### Phase 7 — decide whether Eww should replace Waybar
 
@@ -907,9 +853,9 @@ If suspend triggers unexpectedly:
 If resume fails, automatic suspend remains disabled until manual and lid
 suspend again pass the complete hardware verification.
 
-### Graphical greeter
+### Greeter or post-logout policy
 
-If the graphical greeter fails:
+If a greeter or post-logout idle-policy change fails:
 
 1. switch to TTY3;
 2. inspect `greetd.service` and the current boot journal;
@@ -917,14 +863,12 @@ If the graphical greeter fails:
 4. restart greetd only when no unsaved graphical session is active;
 5. prove login and logout before rebooting.
 
-Never “repair” a themed greeter by enabling autologin or weakening PAM.
+Never “repair” the greeter by enabling autologin or weakening PAM.
 
 ## Decisions recorded by this guide
 
 - Niri plus independently selected components is the chosen long-term desktop.
-- DMS is rejected as the target shell and is not part of the clean installation
-  or migration path.
-- Noctalia remains a design reference and future comparison, not a dependency.
+- No complete-shell migration is part of the installation or roadmap.
 - The existing Waybar/Fuzzel/Mako/swaybg/swaylock/swayidle stack remains the
   reproducible recovery baseline while the modular desktop evolves.
 - Waybar and Fuzzel are styled before any replacement is considered.
@@ -939,10 +883,9 @@ Never “repair” a themed greeter by enabling autologin or weakening PAM.
   lid-driven initially.
 - Post-logout automatic suspend is a separate greeter/logind project because
   user-session timers end at logout.
-- greetd remains the login manager and tuigreet remains the recovery frontend
-  until a graphical candidate passes PAM, logout, update, and TTY tests.
+- greetd remains the login manager and tuigreet remains the selected frontend.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
-- Theme, icon, cursor, wallpaper, shell, greeter, and idle changes will be
+- Theme, icon, cursor, wallpaper, modular-component, and idle changes will be
   delivered as independent, reversible phases.
 
 ## Sources
@@ -966,6 +909,3 @@ Never “repair” a themed greeter by enabling autologin or weakening PAM.
 - [logind.conf(5)](https://www.freedesktop.org/software/systemd/man/latest/logind.conf.html)
 - [systemd-inhibit(1)](https://www.freedesktop.org/software/systemd/man/latest/systemd-inhibit.html)
 - [greetd upstream](https://sr.ht/~kennylevinsen/greetd/)
-- [Noctalia documentation](https://docs.noctalia.dev/)
-- [Noctalia repository and maturity notice](https://github.com/noctalia-dev/noctalia)
-- [Noctalia releases](https://github.com/noctalia-dev/noctalia/releases)

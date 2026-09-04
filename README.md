@@ -6,10 +6,11 @@ repositories.
 
 ## Project status
 
-Active writing stage. The taxonomy and article standard are defined, and the
-first reviewed guide establishes how configuration files and overrides are
-interpreted. Further articles will be added by topic rather than by repeating
-the installation sequence.
+Stable first reference edition with active extensions. The core subsystem,
+operation, diagnosis, and recovery guides are published and reviewed, and the
+daily-command reference records the first hardware-validated workstation
+baseline. Further articles are added by topic rather than by repeating the
+installation sequence.
 
 ## Purpose
 
@@ -24,6 +25,10 @@ post-install procedure:
 
 It is not a second installation runbook. Articles should stand on their own
 and may be read in any order.
+
+For routine workstation use, keep the
+[daily and occasional command cheatsheet](guides/maintenance-and-recovery/27-daily-and-occasional-command-cheatsheet.md)
+close at hand.
 
 ## Content policy
 
