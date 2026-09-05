@@ -897,6 +897,13 @@ the user remains inactive, the helper does not start a retry clock. New input
 resets swayidle and a later complete idle cycle may try again. This fail-closed
 choice avoids a detached timer suspending after activity resumed.
 
+Because swayidle executes the helper directly, the dotfiles repository must
+track it as executable mode `100755`. `chmod +x` repairs a current Arch working
+tree, but the permission reaches future clones only after the Git index records
+it. The corrected chapter checkpoint is `post-install-18-v2`; the immutable
+`post-install-18-v1` tag documents the original non-executable packaging
+mistake.
+
 ### Hibernation
 
 Hibernation deserves a separate storage-and-boot design. It must account for

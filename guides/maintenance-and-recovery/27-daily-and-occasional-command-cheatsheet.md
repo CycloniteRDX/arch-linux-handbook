@@ -752,6 +752,7 @@ busctl --system get-property \
   OnBattery
 pgrep -a -x swayidle
 journalctl -b -t idle-suspend --no-pager
+test -x ~/.local/bin/idle-suspend
 ```
 
 The 30-minute stage requests suspend only for `b true`. Keep a long command
@@ -764,6 +765,22 @@ systemd-inhibit --what=sleep --mode=block \
 
 This blocks the final sleep request, not the earlier lock or monitor-off
 stages. Prefer AC for unattended full upgrades.
+
+From the `niri-dotfiles` repository, confirm that the permission is portable
+and not only fixed in the current working tree:
+
+```bash
+git ls-files --stage scripts/.local/bin/idle-suspend
+```
+
+The first field must be `100755`. If a Windows checkout is preparing the
+correction, stage it explicitly and verify it before committing:
+
+```bash
+git add --chmod=+x scripts/.local/bin/idle-suspend
+git diff --cached --summary
+git ls-files --stage scripts/.local/bin/idle-suspend
+```
 
 After a suspend problem, inspect the current or previous boot as appropriate:
 

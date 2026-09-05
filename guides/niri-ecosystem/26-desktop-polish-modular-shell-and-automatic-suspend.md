@@ -618,6 +618,23 @@ The helper should not:
 It calls `systemctl --check-inhibitors=yes suspend`. logind, systemd sleep
 units, the kernel, and the pre-sleep locker retain their established roles.
 
+The helper is invoked as a program, so its executable bit is part of the
+configuration contract. Git must store
+`scripts/.local/bin/idle-suspend` as mode `100755`; a working-tree-only
+`chmod +x` fixes one machine but not the next clone. Check both layers from the
+dotfiles repository:
+
+```bash
+git ls-files --stage scripts/.local/bin/idle-suspend
+test -x scripts/.local/bin/idle-suspend
+```
+
+The first command must begin with `100755` and the second must succeed. When a
+change is staged from Windows, use `git add --chmod=+x` because ZIP extraction
+on NTFS is not a reliable carrier for Unix mode bits. This correction is the
+difference between the historical `post-install-18-v1` checkpoint and the
+deployable `post-install-18-v2` checkpoint.
+
 ### Idle inhibitors
 
 Wayland applications may inhibit compositor idle handling during video,
