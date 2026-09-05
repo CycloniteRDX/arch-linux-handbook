@@ -50,6 +50,7 @@ this project rather than a monolithic shell product.
 | Notification service | Mako | Replace experimentally with SwayNotificationCenter |
 | Notification history and control panel | None beyond Mako tools | Add through SwayNotificationCenter |
 | Wallpaper renderer | swaybg | Keep initially; wrap or replace only for desired transitions or per-output behavior |
+| Qt 6 appearance | qt6ct with Fusion | Keep as the sole Qt 6 widget-theme owner; evaluate exceptions per application |
 | Screen locker | swaylock | Restyle first, then compare hyprlock or gtklock |
 | Idle and pre-sleep coordination | swayidle | Keep while building automatic suspend |
 | Custom dashboard and widgets | None | Introduce Eww for one bounded surface at a time |
@@ -100,6 +101,8 @@ mako/
 wallpapers/
 swaylock/
 kitty/
+theme/
+qt6ct/
 ```
 
 The safest repository design keeps independently deployable packages. A new
@@ -185,11 +188,98 @@ applications. A platform-theme plugin or a tool such as `qt6ct` can configure
 fonts, icons, palette, and style for Qt 6 applications, but its environment
 selection affects all matching clients.
 
-The project will not install Qt theming infrastructure pre-emptively. First
-inventory the Qt applications actually used, then select one maintained Qt 6
-path and test native Wayland behavior, portals, file choosers, scaling, and
-icons. Do not stack `qt5ct`, `qt6ct`, Kvantum, and several environment variables
-without a consumer map.
+The selected project path is now deliberately narrow:
+
+| Boundary | Decision |
+| --- | --- |
+| Qt generation | Qt 6 only |
+| Platform theme | qt6ct from the official Arch repository |
+| Widget style | Qt's built-in Fusion style |
+| Palette | Project-owned Midnight Circuit color scheme |
+| Icons and fonts | Papirus Dark, Noto Sans 10, Noto Sans Mono 10 |
+| Standard dialogs | XDG Desktop Portal through qt6ct |
+| Session selection | `QT_QPA_PLATFORMTHEME=qt6ct` in Niri's environment block |
+| Display backend | Qt automatic selection; no global `QT_QPA_PLATFORM` |
+
+`QT_QPA_PLATFORMTHEME` chooses the provider for platform palettes, fonts,
+theme hints, and native-dialog integration. It is not the same variable as
+`QT_QPA_PLATFORM`, which chooses a window-system plugin such as Wayland or XCB.
+Conflating the two makes diagnosis needlessly difficult.
+
+Niri is the single environment owner because Fuzzel and the applications it
+launches are descendants of Niri. The selected block is:
+
+```kdl
+environment {
+    QT_QPA_PLATFORMTHEME "qt6ct"
+}
+```
+
+This scope intentionally does not reach unrelated compositors. Niri documents
+that its local environment block also does not update the systemd user
+manager's global environment. A future Qt program started directly by a
+systemd user unit would therefore need an explicit consumer review rather than
+a second global export added speculatively.
+
+The project does not force `QT_QPA_PLATFORM=wayland`. Current Qt can select its
+Wayland plugin in the Niri session, while leaving XCB/XWayland available for an
+application with a real compatibility requirement. `QT_QPA_PLATFORM=wayland`
+or `QT_QPA_PLATFORM=xcb` is useful as a one-process diagnostic prefix, not as a
+permanent catch-all.
+
+The tracked qt6ct configuration uses
+`standard_dialogs=xdgdesktopportal`. This preserves the portal boundary already
+established for Niri instead of pulling in a KDE file picker. Current Arch
+packages place `libqwayland.so` and `libqxdgdesktopportal.so` in `qt6-base`,
+which is a dependency of qt6ct. The separately named `qt6-wayland` package is
+not required for this client appearance setup under that packaging layout;
+always recheck current package metadata before installation.
+
+The portable files are:
+
+```text
+~/.config/qt6ct/qt6ct.conf
+~/.config/qt6ct/colors/midnight-circuit.conf
+```
+
+Qt6ct records a custom color-scheme path as an absolute path. The two supported
+machines use the canonical `neon` account, so the reviewed file names
+`/home/neon/...`. Reuse under another account requires changing that one line
+before deployment. Hiding a second untracked copy elsewhere would be less
+portable, not more.
+
+Qt palette files contain active, disabled, and inactive groups. Each group maps
+21 ordered Qt color roles, including window text, buttons, base, window,
+selection, links, tooltips, and placeholder text. Checking only the main
+background misses disabled or unfocused states where contrast failures often
+appear.
+
+Qt6ct primarily controls QWidget applications. Qt Quick controls, KDE
+Frameworks applications, sandboxed packages, and self-themed programs may
+consume different layers or override parts of the result. Qt 5 also does not
+read the Qt 6 configuration. Treat each exception as an application boundary;
+do not stack `qt5ct`, Kvantum, Plasma settings, `QT_STYLE_OVERRIDE`, and several
+environment exports simply because one program differs.
+
+Useful inspection commands are:
+
+```bash
+printf 'QT_QPA_PLATFORMTHEME=%s\n' "$QT_QPA_PLATFORMTHEME"
+printenv QT_QPA_PLATFORM || true
+printenv QT_STYLE_OVERRIDE || true
+pacman -Q qt6ct qt6-base qt6-svg
+pacman -Qo /usr/lib/qt6/plugins/platformthemes/libqt6ct.so
+pacman -Qo /usr/lib/qt6/plugins/platforms/libqwayland.so
+pacman -Qo /usr/lib/qt6/plugins/platformthemes/libqxdgdesktopportal.so
+grep -E '^(color_scheme_path|custom_palette|icon_theme|standard_dialogs|style)=' \
+  ~/.config/qt6ct/qt6ct.conf
+```
+
+Qt6ct is itself a settings editor and can write geometry or other state when it
+closes. If its live file is a GNU Stow link into Git, use the post-install
+chapter's temporary `XDG_CONFIG_HOME` procedure for inspection. Launch the
+normal settings entry only for an intentional configuration change, then
+review the repository diff.
 
 ### Icons are named resources
 
@@ -704,11 +794,26 @@ the phase that owns it, so Git history explains how the desktop was assembled.
    monospace font;
 3. add one licensed wallpaper plus attribution and fallback color;
 4. apply the palette to the existing Waybar, Fuzzel, Mako, swaylock, and Kitty;
-5. test GTK 3, GTK 4/libadwaita, Qt where present, XWayland, portals, and mixed
-   display scale;
+5. test GTK 3, GTK 4/libadwaita, XWayland, portals, and mixed display scale;
 6. publish the theme and wallpaper as independent Stow packages.
 
 This produces a coherent desktop before changing protocol owners.
+
+### Phase 1a — Qt 6 appearance boundary
+
+1. install only qt6ct from the official repository and inspect its dependency
+   and plugin ownership;
+2. add the independent qt6ct Stow package and one Niri environment value;
+3. select Fusion, the project palette, Papirus Dark, Noto fonts, and XDG portal
+   dialogs;
+4. leave `QT_QPA_PLATFORM` and `QT_STYLE_OVERRIDE` unset globally;
+5. test the Qt6ct QWidget itself on native Wayland with a temporary config copy;
+6. retest portal dialogs, scaling, icons, and repository cleanliness;
+7. evaluate every later Qt 6 application at its actual QWidget, Qt Quick, KDE
+   Frameworks, or sandbox boundary.
+
+This is a separate reversible post-install chapter because the GTK visual
+foundation does not require Qt infrastructure.
 
 ### Phase 2 — richer notifications
 
@@ -885,6 +990,10 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   user-session timers end at logout.
 - greetd remains the login manager and tuigreet remains the selected frontend.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
+- qt6ct plus Fusion is the sole Qt 6 widget-appearance path; Niri exports only
+  `QT_QPA_PLATFORMTHEME=qt6ct`, while Qt retains automatic platform selection.
+- Qt standard dialogs use the XDG Desktop Portal provider; Qt 5, Kvantum,
+  Plasma settings, and a global `QT_STYLE_OVERRIDE` are outside this phase.
 - Theme, icon, cursor, wallpaper, modular-component, and idle changes will be
   delivered as independent, reversible phases.
 
@@ -893,6 +1002,12 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - [ArchWiki: GTK](https://wiki.archlinux.org/title/GTK)
 - [ArchWiki: Qt](https://wiki.archlinux.org/title/Qt)
 - [ArchWiki: Uniform look for Qt and GTK applications](https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications)
+- [Arch package: qt6ct](https://archlinux.org/packages/extra/x86_64/qt6ct/)
+- [Arch package files: qt6-base](https://archlinux.org/packages/extra/x86_64/qt6-base/files/)
+- [qt6ct upstream](https://www.opencode.net/trialuser/qt6ct)
+- [Qt Platform Abstraction](https://doc.qt.io/qt-6/qpa.html)
+- [Niri environment configuration](https://niri-wm.github.io/niri/Configuration:-Miscellaneous.html#environment)
+- [XDG Desktop Portal design](https://flatpak.github.io/xdg-desktop-portal/docs/design-considerations.html)
 - [ArchWiki: Icons](https://wiki.archlinux.org/title/Icons)
 - [ArchWiki: Cursor themes](https://wiki.archlinux.org/title/Cursor_themes)
 - [XDG Icon Theme Specification](https://specifications.freedesktop.org/icon-theme-spec/latest/)

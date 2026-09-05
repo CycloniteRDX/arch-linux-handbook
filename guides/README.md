@@ -118,9 +118,9 @@ only when its first reviewed article is ready.
   behavior, workspace migration, and a portable per-ThinkPad override design.
 - [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
   selects a personal modular Niri desktop, separates themes, icons, cursors,
-  wallpapers, notifications, widgets, locking, the stable tuigreet boundary,
-  and idle ownership; it defines the reversible path toward SwayNC, Eww,
-  improved locking, and battery-aware automatic suspend.
+  wallpapers, Qt 6 appearance, notifications, widgets, locking, the stable
+  tuigreet boundary, and idle ownership; it defines the reversible path toward
+  SwayNC, Eww, improved locking, and battery-aware automatic suspend.
 
 ### Maintenance and recovery
 
@@ -158,7 +158,7 @@ recoverable.
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
 | 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
 | 25 | Published | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
-| 26 | Published | Themes, icons, cursors, wallpapers, modular desktop polish, the stable tuigreet boundary, and automatic suspend. |
+| 26 | Published | Themes, icons, cursors, wallpapers, Qt 6 appearance, modular desktop polish, the stable tuigreet boundary, and automatic suspend. |
 | 27 | Published | Daily and occasional command reference for operating and maintaining the validated workstation. |
 
 The first essential edition and all seven accepted extensions are complete.

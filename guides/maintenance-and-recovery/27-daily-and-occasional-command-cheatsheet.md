@@ -13,7 +13,7 @@ It covers:
 - files, disk space, Trash, archives, and removable storage;
 - Wi-Fi, Bluetooth, audio, brightness, battery profiles, and suspend;
 - processes, systemd services, logs, firewall state, and boot trust;
-- firmware checks, Restic backups, Git, dotfiles, and Niri;
+- firmware checks, Restic backups, Git, dotfiles, Niri, and Qt 6 appearance;
 - a practical recurring-maintenance cadence.
 
 It is not a substitute for the detailed guides. When a command gives an
@@ -1067,6 +1067,36 @@ systemctl --user --failed --no-pager
 `swaylock` is normally absent while the session is unlocked. Each other
 selected role should have exactly one owner.
 
+### Inspect Qt 6 appearance
+
+```bash
+printf 'QT_QPA_PLATFORMTHEME=%s\n' "$QT_QPA_PLATFORMTHEME"
+printenv QT_QPA_PLATFORM || true
+printenv QT_STYLE_OVERRIDE || true
+pacman -Q qt6ct qt6-base qt6-svg
+readlink -f ~/.config/qt6ct/qt6ct.conf
+readlink -f ~/.config/qt6ct/colors/midnight-circuit.conf
+grep -E '^(color_scheme_path|custom_palette|icon_theme|standard_dialogs|style)=' \
+  ~/.config/qt6ct/qt6ct.conf
+```
+
+The selected state is `QT_QPA_PLATFORMTHEME=qt6ct`, Fusion, Papirus Dark, the
+Midnight Circuit scheme, and `xdgdesktopportal`. `QT_QPA_PLATFORM` and
+`QT_STYLE_OVERRIDE` remain unset globally.
+
+Test one application's backend without changing the session:
+
+```bash
+QT_QPA_PLATFORM=wayland QT_APPLICATION
+QT_QPA_PLATFORM=xcb QT_APPLICATION
+```
+
+These are diagnostic prefixes for one process. Use only the command that
+matches the question being tested; do not export either value globally. The
+normal qt6ct editor can modify its tracked configuration through the Stow link,
+so use chapter 17's temporary inspection procedure unless the change is
+intentional, then review `git diff`.
+
 ### Portable keyboard shortcuts
 
 | Shortcut | Action |
@@ -1107,14 +1137,14 @@ From `~/Projects/CycloniteRDX/niri-dotfiles`, preview before changing links:
 
 ```bash
 git status --short --branch
-stow --simulate --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme
+stow --simulate --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct
 niri validate --config niri/.config/niri/config.kdl
 ```
 
 After a reviewed repository change, reconcile the deployed links:
 
 ```bash
-stow --restow --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme
+stow --restow --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct
 niri validate
 ```
 
@@ -1211,4 +1241,6 @@ actual fault and construct a bounded recovery operation.
 - [Arch manual: journalctl(1)](https://man.archlinux.org/man/journalctl.1.en)
 - [Arch manual: udisksctl(1)](https://man.archlinux.org/man/udisksctl.1.en)
 - [Niri documentation](https://niri-wm.github.io/niri/)
+- [Arch package: qt6ct](https://archlinux.org/packages/extra/x86_64/qt6ct/)
+- [Niri environment configuration](https://niri-wm.github.io/niri/Configuration:-Miscellaneous.html#environment)
 - [Restic documentation](https://restic.readthedocs.io/en/latest/)
