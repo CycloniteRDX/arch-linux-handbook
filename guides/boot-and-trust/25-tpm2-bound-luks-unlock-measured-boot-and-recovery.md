@@ -30,11 +30,12 @@ This guide explains:
 - update, firmware, key-rotation, testing, rollback, and ISO recovery paths;
 - where `systemd-pcrlock` fits and why it is not the first implementation.
 
-The handbook does not execute the future implementation. Publishing this
-article does not install TPM packages, create keys, change either UKI, edit a
-kernel command line, add or remove a LUKS keyslot, enroll the TPM, change a PIN,
-clear the TPM, or alter Secure Boot. Every mutating command below is an
-annotated future procedure, not an instruction to run while reading.
+The ordered implementation now lives in chapter 20 of
+`arch-linux-post-install`. Publishing or reading this article does not install
+TPM packages, create keys, change either UKI, edit a kernel command line, add
+or remove a LUKS keyslot, enroll the TPM, change a PIN, clear the TPM, or alter
+Secure Boot. Use the post-install chapter's checkpoints rather than treating
+the illustrative commands below as one block.
 
 Unless stated otherwise, examples run in Bash on the installed Arch system.
 Package-delivery commands run separately in PowerShell on Windows.
@@ -65,7 +66,7 @@ The relevant artifacts are:
 | `/boot/EFI/Linux/arch-linux.efi` | Normal host-specific UKI |
 | `/boot/EFI/Linux/arch-linux-fallback.efi` | Broader recovery UKI |
 | `/etc/kernel/cmdline` | Normal embedded command-line source |
-| `/etc/kernel/cmdline-fallback` | Planned textual fallback source from guide 24 |
+| `/etc/kernel/cmdline-fallback` | Maintained textual fallback source from post-install chapter 19 |
 | `/etc/mkinitcpio.d/linux.preset` | Normal and fallback UKI build policy |
 | `/var/lib/sbctl` | Existing Secure Boot signing state and owner keys |
 
@@ -198,7 +199,7 @@ Useful inspections are:
 systemd-analyze has-tpm2
 systemd-analyze identify-tpm2
 systemd-analyze pcrs 7 11
-journalctl -b -k --grep='tpm\|ima' --no-pager
+journalctl -b -k --grep='tpm|ima' --no-pager
 ```
 
 The optional `tpm2-tools` package adds lower-level commands such as
@@ -314,7 +315,7 @@ authority throughout the fully booted system.
 
 ## Recommended policy for this project
 
-The first future implementation will use all of these conditions:
+Post-install chapter 20 uses all of these conditions:
 
 1. **Raw PCR 7 in the SHA-256 bank.** The current Secure Boot policy and
    authorities must match the state present at enrollment.
@@ -525,7 +526,7 @@ directly with existing mkinitcpio, ukify, UKI, and sbctl responsibilities.
 `systemd-pcrlock` can be evaluated later if a concrete threat model requires
 firmware, GPT, filesystem, or runtime measurement coverage beyond this guide.
 
-## Future staged implementation
+## Staged implementation mirrored by post-install chapter 20
 
 The order below is part of the safety design. Do not combine stages merely
 because the final enrollment command is short.
@@ -582,7 +583,7 @@ pacman -Q systemd systemd-ukify cryptsetup tpm2-tss
 pacman -Q tpm2-tools
 ```
 
-If `tpm2-tss` is absent, the future implementation installs it through the
+If `tpm2-tss` is absent, the implementation installs it through the
 normal complete-upgrade transaction, not with a partial database refresh:
 
 ```bash
@@ -632,7 +633,7 @@ Create another timestamped header backup after the recovery slot is tested.
 
 ### Stage 5: create a dedicated PCR-policy key pair
 
-The future `/etc/kernel/uki.conf` should configure only PCR signing. sbctl
+The chapter 20 `/etc/kernel/uki.conf` configures only PCR signing. sbctl
 continues to own Secure Boot signing, so do not add sbctl's db private key or a
 second Secure Boot signing workflow to this file.
 
@@ -731,7 +732,7 @@ without removing the established path.
 
 ### Stage 8: enroll one TPM2 token last
 
-Only after every previous checkpoint, the planned enrollment is:
+Only after every previous checkpoint, the operational enrollment is:
 
 ```bash
 sudo systemd-cryptenroll /dev/nvme0n1p2 \
@@ -1127,7 +1128,7 @@ The recorded design is:
 - the current strong LUKS passphrase remains a valid independent keyslot;
 - a generated offline recovery key is added and tested before TPM enrollment;
 - the TPM token is an additional unlock route, not the only route;
-- the recommended future normal path uses TPM2 with a unique PIN;
+- the chapter 20 normal path uses TPM2 with a unique PIN;
 - unattended TPM unlock without a PIN is not selected for this laptop;
 - the policy combines raw PCR 7 in SHA-256 with a signed PCR 11
   `enter-initrd` policy in SHA-256;
@@ -1152,8 +1153,8 @@ The recorded design is:
 - `systemd-pcrlock`, raw firmware PCR binding, PCR 15 root pinning, FIDO2, and
   remote attestation remain advanced alternatives rather than first steps;
 - clearing the TPM is not routine enrollment, update, rollback, or recovery;
-- the guide documents a future improvement and does not alter the installed
-  system.
+- the handbook explains the design, while post-install chapter 20 contains the
+  reviewed procedure and awaits hardware validation.
 
 ## Further deductions
 

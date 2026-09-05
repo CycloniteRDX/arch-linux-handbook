@@ -779,11 +779,11 @@ Signing answers “is this assembled artifact trusted by the enrolled key?” It
 does not prove that a theme is readable, that the prompt is visible on a dock,
 or that its script is well designed.
 
-The order of roadmap guides is deliberate. Adding Plymouth changes the
-initramfs and therefore the UKI hash and measured-boot values. The presentation
-and fallback design should become stable before guide 25 defines TPM2 PCR
-policy. Otherwise an automatic-unlock experiment would be diagnosed at the
-same time as a changing boot image.
+The order of roadmap work is deliberate. Adding Plymouth changes the initramfs
+and therefore the UKI hash and measured-boot values. The presentation and
+fallback design must be stable before post-install chapter 20 applies guide
+25's TPM2 PCR policy. Otherwise a TPM-unlock experiment would be diagnosed at
+the same time as a changing boot image.
 
 A systemd-stub `.splash` bitmap is also embedded, signed, and included in the
 UKI measurement model. Final visual assets therefore belong before a rigid
@@ -904,7 +904,8 @@ The recorded design is:
 - a UKI `.splash` bitmap is separate and deferred to final visual polish;
 - all rebuilds must complete for both presets and pass sbctl verification;
 - theme/package removal must follow source restoration and a verified rebuild;
-- Plymouth is stabilized before guide 25 designs TPM2-bound LUKS unlock;
+- Plymouth is stabilized before post-install chapter 20 applies guide 25's
+  TPM2-bound LUKS unlock design;
 - the strong LUKS passphrase and textual fallback remain recovery credentials.
 
 ## Sources and further reading
@@ -921,5 +922,5 @@ The recorded design is:
 - [`systemd-stub(7)`](https://man.archlinux.org/man/systemd-stub.7.en)
 - [`kernel-command-line(7)`](https://man.archlinux.org/man/kernel-command-line.7.en)
 
-The next handbook extension is guide 25: TPM2-bound LUKS unlocking, measured
-boot policy, fallback credentials, update behavior, and recovery.
+Continue with guide 25 for the TPM2-bound LUKS design, then use post-install
+chapter 20 for its ordered implementation and hardware-validation checkpoints.

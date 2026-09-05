@@ -987,6 +987,26 @@ Plymouth boot, press `Esc` to reveal detailed messages. If the graphical LUKS
 request is invisible or unusable, select the textual fallback UKI at the next
 systemd-boot menu instead of typing the passphrase blindly.
 
+After post-install chapter 20, inspect the additional TPM and signed-PCR
+policy without changing it:
+
+```bash
+systemd-analyze has-tpm2
+systemd-analyze pcrs 7 11
+sudo systemd-cryptenroll /dev/nvme0n1p2
+sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text /boot/EFI/Linux/arch-linux.efi
+sudo test -s /run/systemd/tpm2-pcr-signature.json
+sudo test -s /run/systemd/tpm2-pcr-public-key.pem
+sudo sbctl verify
+```
+
+The normal UKI requests `tpm2-device=auto` and accepts the unique TPM PIN.
+Fallback omits that option and continues to require the strong LUKS
+passphrase or recovery key. After a boot-related package update, regenerate
+and inspect both UKIs as documented in chapter 20; a valid newly signed PCR 11
+value does not require routine TPM reenrollment. Never clear the TPM or wipe a
+password/recovery slot to fix a failed PIN path.
+
 ## Restic backup routine
 
 For disk identification, LUKS handling, recovery material, and restore drills,
@@ -1259,6 +1279,8 @@ script.
 - Boot and test the fallback UKI when the boot path changed.
 - Refresh the encrypted recovery bundle after LUKS keyslot, LUKS token, or
   Secure Boot key changes.
+- After TPM enrollment, confirm both UKIs still contain valid signed-PCR
+  sections and test normal PIN plus textual passphrase boots.
 - Repeat the recovery-media drill after a material partition, encryption,
   boot-manager, or initramfs redesign.
 

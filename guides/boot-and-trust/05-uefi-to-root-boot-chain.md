@@ -455,9 +455,10 @@ The underlying partition remains encrypted. The mapping exists only while it
 is open in the running system.
 
 This project keeps a strong passphrase as the canonical recovery credential.
-TPM2-assisted unlocking is deferred. A later TPM design must preserve a tested
-passphrase path and define which measured boot state authorizes automatic
-release; convenience alone is not a sufficient policy.
+TPM2-assisted unlocking is a separate optional extension in handbook guide 25
+and post-install chapter 20. It preserves a tested passphrase path and defines
+which measured boot state authorizes release; convenience alone is not a
+sufficient policy.
 
 Inspect the live mapping after boot:
 

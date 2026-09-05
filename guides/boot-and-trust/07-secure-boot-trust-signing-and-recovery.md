@@ -363,10 +363,10 @@ Secure Boot verification and TPM measurement are different operations:
 - TPM-bound LUKS unlock can release a secret only when a chosen PCR policy
   matches.
 
-The current project uses a manual LUKS passphrase and does not bind unlocking to
-TPM2 PCRs. This is deliberate. Adding TPM-assisted unlock requires a recovery
-key, an explicit PCR policy, tests for kernel/firmware updates, and a plan for
-policy resealing. Secure Boot being enabled is not enough to design that safely.
+The frozen installation baseline uses a manual LUKS passphrase and does not
+bind unlocking to TPM2 PCRs. Post-install chapter 20 may add that route only
+through guide 25's explicit recovery, PCR, update, and resealing policy.
+Secure Boot being enabled is not enough to design TPM unlock safely.
 
 Similarly, sbctl can support TPM-backed signing-key types in current versions,
 but this project uses file-backed keys protected at rest by LUKS2. Migrating or
@@ -485,7 +485,7 @@ Do not perform these actions merely as experiments on a working machine:
 | Key storage | File-backed below encrypted root | Simple reproducible sbctl workflow; protected at rest by LUKS2 |
 | Update policy | Rebuild, sign, distribute, then verify | Avoid discovering an unsigned next boot after reboot |
 | Recovery | Preserve keys; disable enforcement temporarily if necessary | Keep trust identity while repairing artifacts |
-| TPM2 unlock | Deferred | Requires its own PCR, recovery, and update policy |
+| TPM2 unlock | Separate guide 25 and post-install chapter 20 | Requires its own PCR, recovery, and update policy |
 | Key rotation | Deferred until explicitly designed | Rotation affects firmware trust, backups, and every signed artifact |
 
 ## Further reading
