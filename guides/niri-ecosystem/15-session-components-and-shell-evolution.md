@@ -15,7 +15,7 @@ easy to confuse:
   replacing Niri itself.
 
 This guide explains the current modular stack and records the safe evolution
-path toward a more polished desktop. The accepted future goals are:
+path toward a more polished desktop. The accepted goals are:
 
 - a more attractive lock screen than the current minimal swaylock setup;
 - a richer notification experience than transient Mako popups alone;
@@ -24,10 +24,11 @@ path toward a more polished desktop. The accepted future goals are:
 - continued visual refinement without surrendering the explicit component
   boundaries.
 
-These are recorded design goals, not immediate configuration changes. The
-current daily-driver baseline remains canonical until each replacement passes
-the same authentication, suspend, recovery, and duplication tests as the
-component it supersedes.
+The battery-only automatic-suspend stage now has a separately reviewed
+post-install implementation; the visual replacements remain future work. The
+daily-driver baseline remains recoverable until each replacement passes the
+same authentication, suspend, recovery, and duplication tests as the component
+it supersedes.
 
 ## Current project contract
 
@@ -52,7 +53,7 @@ spawn-at-startup "/usr/lib/mate-polkit/polkit-mate-authentication-agent-1"
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
 spawn-at-startup "swaybg" "-c" "#101014"
-spawn-at-startup "swayidle" "-w" "timeout" "300" "swaylock -f" "timeout" "600" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "before-sleep" "swaylock -f" "lock" "swaylock -f"
+spawn-at-startup "swayidle" "-w" "timeout" "300" "swaylock -f" "timeout" "600" "niri msg action power-off-monitors" "resume" "niri msg action power-on-monitors" "timeout" "1800" "$HOME/.local/bin/idle-suspend" "before-sleep" "swaylock -f" "lock" "swaylock -f"
 ```
 
 This baseline has several advantages while learning and diagnosing the system:
@@ -436,13 +437,13 @@ event ownership and sequencing:
 - when displays turn off and on;
 - how logind lock requests are handled;
 - whether the locker is ready before suspend;
-- when future automatic suspend occurs.
+- when automatic suspend occurs.
 
 It is valid to keep swayidle while replacing swaylock. In fact, that is the
 safest modular migration because only the visible/authentication component
 changes at first.
 
-## Future automatic suspend
+## Automatic session suspend
 
 The desired idle progression is:
 
@@ -459,13 +460,13 @@ selected initial third stage is battery-only suspend after 30 idle minutes. It
 uses the high-level operation:
 
 ```bash
-systemctl suspend
+systemctl --check-inhibitors=yes suspend
 ```
 
 It will not log out. Logging out terminates Niri and the user processes that
 would otherwise coordinate the remaining idle sequence.
 
-Before implementation, the project must choose:
+The selected implementation contract is:
 
 | Decision | Why it matters |
 | --- | --- |
@@ -474,13 +475,12 @@ Before implementation, the project must choose:
 | Idle owner | swayidle; exactly one coordinator |
 | Wayland inhibitors | Browsers, games, presentations, and media may ask to remain active |
 | systemd inhibitors | Updates, backups, shutdown-sensitive jobs, and applications may block sleep |
-| User warning | A notification or visual countdown must occur early enough to be useful |
 | External displays | Docked use may look idle while serving another purpose |
 | Resume tests | Lock, displays, Wi-Fi, audio, Bluetooth, TLP, and input must recover |
 
-The command can be added to swayidle only after the inhibitor and power-source
-checks are implemented. No second idle service is added; two timers could race
-to lock, blank, or suspend the session.
+The command is isolated in a fail-closed helper that reads UPower before asking
+systemd to suspend with inhibitor checking enabled. No second idle service is
+added; two timers could race to lock, blank, or suspend the session.
 
 Inspect inhibitors before and during long-running tests:
 
@@ -618,7 +618,7 @@ Test in this order:
 
 Never deliberately invalidate the PAM stack for a cosmetic test.
 
-### Idle and future suspend
+### Idle and automatic suspend
 
 Use temporarily shortened timeouts only in an uncommitted test configuration.
 Keep work saved and observe:
@@ -660,8 +660,8 @@ the designed effect. Restore the reviewed values before committing.
 - hyprlock is the leading visual locker candidate; gtklock and a deeper
   swaylock theme remain valid alternatives.
 - swayidle is not a visual component and can remain while the locker changes.
-- Future idle policy will lock, then power off monitors, then suspend after a
-  third timeout; it will not log out.
+- Idle policy locks, then powers off monitors, then requests suspend after a
+  third timeout; it does not log out.
 - The initial automatic-suspend policy is 30 minutes on battery only; automatic
   suspend on AC remains disabled initially.
 - Eww can replace or add selected widgets but does not replace Mako, Fuzzel,
@@ -686,6 +686,8 @@ the designed effect. Restore the reviewed values before committing.
 - [swaylock upstream](https://github.com/swaywm/swaylock)
 - [swayidle upstream](https://github.com/swaywm/swayidle)
 - [swayidle(1)](https://man.archlinux.org/man/swayidle.1.en)
+- [UPower D-Bus interface](https://upower.freedesktop.org/docs/UPower.html)
+- [systemd inhibitor locks](https://systemd.io/INHIBITOR_LOCKS/)
 - [hyprlock documentation](https://wiki.hypr.land/Hypr-Ecosystem/hyprlock/)
 - [gtklock upstream](https://github.com/jovanlanik/gtklock)
 - [gtklock(1)](https://man.archlinux.org/man/gtklock.1.en)

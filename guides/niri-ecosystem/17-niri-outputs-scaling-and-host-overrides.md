@@ -455,8 +455,8 @@ output "eDP-1" {
 is persistent configuration that removes the output until the rule changes.
 It should not be used to implement the ten-minute idle timeout.
 
-The future third idle stage will suspend the computer after locking and
-powering off the monitors. It will still not rewrite output configuration or
+The chapter 18 third idle stage requests battery-only suspend after locking and
+powering off the monitors. It still does not rewrite output configuration or
 log out of Niri.
 
 ## Lid behavior crosses two owners

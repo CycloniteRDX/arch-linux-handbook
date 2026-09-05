@@ -52,7 +52,7 @@ this project rather than a monolithic shell product.
 | Wallpaper renderer | swaybg | Keep initially; wrap or replace only for desired transitions or per-output behavior |
 | Qt 6 appearance | qt6ct with Fusion | Keep as the sole Qt 6 widget-theme owner; evaluate exceptions per application |
 | Screen locker | swaylock | Restyle first, then compare hyprlock or gtklock |
-| Idle and pre-sleep coordination | swayidle | Keep while building automatic suspend |
+| Idle and pre-sleep coordination | swayidle | Keep as sole owner; call the reviewed battery-aware helper at 30 minutes |
 | Custom dashboard and widgets | None | Introduce Eww for one bounded surface at a time |
 | Login manager | greetd | Keep |
 | Login presentation | tuigreet | Keep as the selected and proven frontend |
@@ -557,11 +557,12 @@ The current progression is:
 | 5 minutes | Start swaylock |
 | 10 minutes | Ask Niri to power off monitors |
 | User activity | Ask Niri to power monitors on |
+| 30 minutes | Call the battery-only `idle-suspend` helper |
 | Before any coordinated sleep | Start swaylock and wait |
 
-The planned first automatic-suspend policy is:
+The selected chapter 18 automatic-suspend policy is:
 
-| State | Initial policy candidate |
+| State | Initial reviewed policy |
 | --- | --- |
 | Battery | Lock at 5 minutes, displays off at 10, suspend at 30 |
 | AC power | Lock and displays off, but no automatic suspend initially |
@@ -569,14 +570,14 @@ The planned first automatic-suspend policy is:
 | Manual suspend | Existing lock-before-sleep path remains authoritative |
 | Hibernation | Still not configured |
 
-The 30-minute value is an initial test policy, not a universal optimum. It is
+The 30-minute value is an initial policy, not a universal optimum. It is
 longer than both visible stages, preserves the user's requested ordering, and
 can be adjusted after observing real work. Battery-only deployment avoids
 interrupting long docked builds before the inhibitor behavior has been proven.
 
 ## Automatic suspend is a sequence, not one timer
 
-The intended session path is:
+The selected session path is:
 
 ```mermaid
 flowchart TD
@@ -600,9 +601,9 @@ must own the progression.
 ### Power-source awareness
 
 swayidle does not become a hardware power manager merely because it invokes
-the final action. A narrow helper may inspect the actual AC-online state and
-request suspend only on battery. It must fail closed—do nothing—when the power
-source cannot be determined.
+the final action. The narrow helper reads UPower's boolean `OnBattery` property
+and requests suspend only for `b true`. It fails closed—does nothing—when the
+power source cannot be determined.
 
 The helper should not:
 
@@ -614,7 +615,7 @@ The helper should not:
 - force suspend past active inhibitors;
 - terminate the graphical session.
 
-It asks the existing high-level sleep path to suspend. logind, systemd sleep
+It calls `systemctl --check-inhibitors=yes suspend`. logind, systemd sleep
 units, the kernel, and the pre-sleep locker retain their established roles.
 
 ### Idle inhibitors
@@ -709,7 +710,8 @@ greeter change is part of the current roadmap.
 
 ### Independent Stow packages
 
-Keep role boundaries visible in `niri-dotfiles`. A plausible future layout is:
+Keep role boundaries visible in `niri-dotfiles`. The current and plausible
+future layout is:
 
 ```text
 theme/
@@ -727,8 +729,9 @@ scripts/
     .local/bin/...
 ```
 
-This is a design sketch, not permission to create all directories at once.
-Each package appears only when its first reviewed file is ready.
+The `scripts` package now exists for the chapter 18 helper. The remaining
+candidate directories are a design sketch, not permission to create them all
+at once. Each package appears only when its first reviewed file is ready.
 
 ### Separate portable, generated, and machine state
 
@@ -766,7 +769,13 @@ should define:
 Do not turn one large `desktop.sh` into a hidden second shell manager. Narrow
 helpers are easier to test and replace.
 
-## Selected implementation order
+## Implementation phases and current progress
+
+After the visual and Qt foundations, these phases are independent migration
+tracks rather than a strict calendar. Automatic suspend was ready to implement
+as chapter 18 because its owner, policy, rollback, and tests were already
+closed. SwayNC, Eww, and a possible locker replacement still require separate
+visual and interaction choices, so they do not block the power-policy change.
 
 ### Phase 0 — establish the clean modular baseline
 
@@ -841,16 +850,16 @@ foundation does not require Qt infrastructure.
 4. replace every lock path as one coordinated change;
 5. repeat multi-output and suspend/resume testing.
 
-### Phase 5 — automatic session suspend
+### Phase 5 — automatic session suspend (chapter 18)
 
 1. add battery-source detection with a fail-closed helper;
-2. test short temporary timeouts without committing them;
+2. validate both power-source branches without sleeping;
 3. retain lock at 5 minutes and monitor-off at 10 minutes;
 4. add battery-only suspend at 30 minutes;
 5. test Wayland and system inhibitors;
 6. verify repeated resume behind the locker;
-7. restore and commit the reviewed timeouts;
-8. observe normal use before considering automatic suspend on AC.
+7. force the complete event chain with swayidle's documented signal;
+8. observe the real timers before considering automatic suspend on AC.
 
 ### Phase 6 — post-logout idle with tuigreet
 
@@ -983,7 +992,7 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - swaylock is styled first; hyprlock and gtklock remain later candidates.
 - swayidle remains the first coordinator for lock, monitor power, pre-sleep,
   and the new automatic-suspend stage.
-- The initial automatic-suspend candidate is 30 minutes on battery only, after
+- The initial automatic-suspend policy is 30 minutes on battery only, after
   lock at 5 minutes and display-off at 10 minutes; AC suspend remains manual or
   lid-driven initially.
 - Post-logout automatic suspend is a separate greeter/logind project because
@@ -1019,6 +1028,9 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - [swaylock upstream](https://github.com/swaywm/swaylock)
 - [swayidle upstream](https://github.com/swaywm/swayidle)
 - [swayidle(1)](https://man.archlinux.org/man/swayidle.1.en)
+- [UPower D-Bus interface](https://upower.freedesktop.org/docs/UPower.html)
+- [systemctl(1)](https://man.archlinux.org/man/systemctl.1)
+- [systemd inhibitor locks](https://systemd.io/INHIBITOR_LOCKS/)
 - [gtklock upstream](https://github.com/jovanlanik/gtklock)
 - [hyprlock documentation](https://wiki.hypr.land/Hypr-Ecosystem/hyprlock/)
 - [logind.conf(5)](https://www.freedesktop.org/software/systemd/man/latest/logind.conf.html)

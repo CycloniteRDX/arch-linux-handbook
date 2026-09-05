@@ -742,6 +742,29 @@ systemctl poweroff
 Save work first. `systemctl suspend` must return to the locker. Hibernation is
 not configured and must not be substituted for suspend.
 
+Inspect the chapter 18 automatic-suspend boundary:
+
+```bash
+busctl --system get-property \
+  org.freedesktop.UPower \
+  /org/freedesktop/UPower \
+  org.freedesktop.UPower \
+  OnBattery
+pgrep -a -x swayidle
+journalctl -b -t idle-suspend --no-pager
+```
+
+The 30-minute stage requests suspend only for `b true`. Keep a long command
+awake explicitly when it may otherwise run unattended on battery:
+
+```bash
+systemd-inhibit --what=sleep --mode=block \
+  --why="Command must finish" COMMAND
+```
+
+This blocks the final sleep request, not the earlier lock or monitor-off
+stages. Prefer AC for unattended full upgrades.
+
 After a suspend problem, inspect the current or previous boot as appropriate:
 
 ```bash
@@ -1137,14 +1160,14 @@ From `~/Projects/CycloniteRDX/niri-dotfiles`, preview before changing links:
 
 ```bash
 git status --short --branch
-stow --simulate --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct
+stow --simulate --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct scripts
 niri validate --config niri/.config/niri/config.kdl
 ```
 
 After a reviewed repository change, reconcile the deployed links:
 
 ```bash
-stow --restow --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct
+stow --restow --verbose --no-folding --target="$HOME" niri autostart mimeapps waybar fuzzel mako wallpapers swaylock kitty theme qt6ct scripts
 niri validate
 ```
 

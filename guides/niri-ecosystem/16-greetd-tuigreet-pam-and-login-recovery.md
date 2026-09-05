@@ -509,9 +509,10 @@ shutdown and returns. greetd notices that the authenticated session command
 ended and launches tuigreet again. Seeing the greeter after logout is the
 expected lifecycle.
 
-The planned automatic idle sequence is lock, then monitors off, then suspend.
-It will not call Niri's quit action. Logout would discard application state and
-is not an acceptable substitute for power management.
+The selected automatic idle sequence is lock, then monitors off, then a
+battery-only suspend request. It does not call Niri's quit action. Logout would
+discard application state and is not an acceptable substitute for power
+management.
 
 ## Why tuigreet remains selected
 

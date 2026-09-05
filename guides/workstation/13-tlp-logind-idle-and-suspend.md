@@ -37,8 +37,8 @@ provides the mental model, precedence rules, inspection commands, failure
 boundaries, and recovery reasoning.
 
 The canonical setup does **not** configure hibernation, suspend-then-hibernate,
-automatic idle suspend, custom fan curves, undervolting, overclocking,
-`powertop --auto-tune`, `tlp-rdw`, or a second power manager.
+automatic suspend on AC or after logout, custom fan curves, undervolting,
+overclocking, `powertop --auto-tune`, `tlp-rdw`, or a second power manager.
 
 ## Canonical project policy
 
@@ -58,6 +58,8 @@ The resulting behavior is:
 | Five idle minutes | Lock |
 | Ten idle minutes | Power displays off, without suspending |
 | User activity after display timeout | Power displays on |
+| Thirty idle minutes on battery | Request suspend while honoring inhibitors |
+| Thirty idle minutes on external power | Stay awake |
 | Any systemd-coordinated sleep | Lock before the machine sleeps |
 | Hibernation | Not configured |
 
@@ -87,6 +89,7 @@ spawn-at-startup "swayidle" "-w" \
     "timeout" "300" "swaylock -f" \
     "timeout" "600" "niri msg action power-off-monitors" \
     "resume" "niri msg action power-on-monitors" \
+    "timeout" "1800" "$HOME/.local/bin/idle-suspend" \
     "before-sleep" "swaylock -f" \
     "lock" "swaylock -f"
 ```
@@ -522,6 +525,7 @@ Its relevant events are:
 | `timeout 300` | Start swaylock after five inactive minutes |
 | `timeout 600` | Ask Niri to power off displays |
 | `resume` | Ask Niri to power displays on after activity |
+| `timeout 1800` | Call the fail-closed battery-only suspend helper |
 | `before-sleep` | Start swaylock before system sleep |
 | `lock` | Respond to a logind session-lock request |
 
@@ -545,9 +549,11 @@ This distinction is deliberate:
 - locking creates an authentication boundary;
 - suspend changes machine power state.
 
-The baseline does not suspend after a timer. Downloads, builds, long reads,
-and initial integration testing therefore do not unexpectedly put the laptop
-to sleep. Manual suspend and lid close remain explicit.
+The post-baseline extension suspends after 30 idle minutes only when UPower
+reports battery operation. On AC, the timer records a safe skip. Long work that
+does not implement a sleep inhibitor should run on AC or inside an explicit
+`systemd-inhibit --what=sleep` scope. Manual suspend and lid close remain
+independent explicit paths.
 
 ### The explicit lock binding
 
@@ -855,32 +861,41 @@ reviewable policy.
 
 ### Automatic idle suspend
 
-The accepted future direction is a three-stage idle sequence:
+The selected extension adds a third stage without adding a second coordinator:
 
-1. lock the existing graphical session;
-2. power off the displays after a longer idle interval;
-3. request suspend after a third, still longer interval.
+1. swayidle locks the existing graphical session after five minutes;
+2. it powers the displays off after ten minutes;
+3. after 30 minutes it calls `~/.local/bin/idle-suspend`;
+4. the helper reads UPower's boolean `OnBattery` D-Bus property;
+5. only `b true` reaches `systemctl --check-inhibitors=yes suspend`.
 
 “Lock” is deliberate wording. Logging out would terminate Niri and its user
-processes, including the idle coordinator that is expected to request the later
-suspend. Automatic logout is a different and more destructive policy.
+processes, including swayidle. Automatic logout and post-logout greeter sleep
+are different policies.
 
-The third timeout is not configured yet. Before choosing it, the project must
-decide:
+The helper is a condition around the request, not another power manager. It
+does not change TLP, write sysfs, use `sudo`, loop, or create a timer. External
+power and unknown state return without sleeping. `--check-inhibitors=yes`
+states the safety boundary explicitly: a blocking sleep inhibitor makes the
+automatic request fail instead of being silently overridden.
 
-- whether automatic suspend applies on battery, AC, or both;
-- how long downloads, builds, media playback, presentations, and screen sharing
-  may keep the system awake;
-- how external displays and docked use affect the timer;
-- whether swayidle or a future desktop shell is the sole idle-policy owner;
-- how the chosen owner observes Wayland, D-Bus, and systemd inhibitors;
-- how it guarantees the locker is established before `systemctl suspend`;
-- how monitor power, Wi-Fi, audio, Bluetooth, TLP, and the lock screen recover.
+Wayland idle inhibition and logind sleep inhibition remain separate. A player
+that implements the Wayland protocol can stop swayidle's progression. A build
+that merely keeps CPUs busy is not user input and may need an explicit scope:
 
-The current baseline therefore stops at locking and display power-off. When
-automatic suspend is implemented, it will be added as a separately reviewed
-change with one owner, an explicit rollback, and repeated AC, battery, lid, and
-resume tests.
+```bash
+systemd-inhibit --what=sleep --mode=block \
+  --why="Local build must finish" make -j"$(nproc)"
+```
+
+That protects the final sleep request, not screen locking or monitor power.
+Unattended upgrades remain safer on AC, where this project never
+auto-suspends.
+
+If a sleep inhibitor blocks the 30-minute attempt and later disappears while
+the user remains inactive, the helper does not start a retry clock. New input
+resets swayidle and a later complete idle cycle may try again. This fail-closed
+choice avoids a detached timer suspending after activity resumed.
 
 ### Hibernation
 
@@ -910,7 +925,9 @@ is not an objective; predictable ownership and verifiable behavior are.
 - [ ] Hibernation remains unconfigured.
 - [ ] One swayidle process owns inactivity and pre-sleep coordination.
 - [ ] swaylock authenticates correctly and is ready before suspend proceeds.
-- [ ] Five minutes locks; ten minutes powers displays off without sleeping.
+- [ ] Five minutes locks and ten minutes powers displays off.
+- [ ] Thirty idle minutes suspend only on battery; AC remains awake.
+- [ ] UPower failure and active inhibitors leave the system awake.
 - [ ] Manual and lid-triggered suspend both resume behind the locker.
 - [ ] Inhibitor locks can be inspected and interpreted.
 - [ ] Networking, TLP, and system/user units are healthy after resume.
@@ -926,7 +943,9 @@ is not an objective; predictable ownership and verifiable behavior are.
 - [systemd: `logind.conf`](https://man.archlinux.org/man/logind.conf.5)
 - [systemd: Inhibitor locks](https://systemd.io/INHIBITOR_LOCKS/)
 - [systemd: `systemd-inhibit`](https://man.archlinux.org/man/systemd-inhibit.1)
+- [systemd: `systemctl`](https://man.archlinux.org/man/systemctl.1)
 - [systemd: Sleep-state logic](https://man.archlinux.org/man/systemd-sleep.8)
+- [UPower D-Bus interface](https://upower.freedesktop.org/docs/UPower.html)
 - [swayidle manual](https://man.archlinux.org/man/swayidle.1)
 - [swaylock manual](https://man.archlinux.org/man/swaylock.1)
 - [ArchWiki: Power management](https://wiki.archlinux.org/title/Power_management)

@@ -87,7 +87,8 @@ only when its first reviewed article is ready.
 - [TLP, logind, idle handling, and suspend](workstation/13-tlp-logind-idle-and-suspend.md)
   explains power-policy ownership, TLP profiles, ThinkPad charge thresholds,
   platform profiles, lid handling, sleep states, inhibitors, pre-suspend
-  locking, resume verification, and layered diagnosis.
+  locking, battery-only automatic session suspend, resume verification, and
+  layered diagnosis.
 - [XDG directories, desktop entries, MIME associations, fonts, and locales](workstation/18-xdg-directories-desktop-entries-mime-and-fonts.md)
   explains base and user directories, portable versus generated state,
   locale and keyboard boundaries, application metadata, MIME detection and
@@ -119,8 +120,9 @@ only when its first reviewed article is ready.
 - [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
   selects a personal modular Niri desktop, separates themes, icons, cursors,
   wallpapers, Qt 6 appearance, notifications, widgets, locking, the stable
-  tuigreet boundary, and idle ownership; it defines the reversible path toward
-  SwayNC, Eww, improved locking, and battery-aware automatic suspend.
+  tuigreet boundary, and idle ownership; it records the selected battery-aware
+  automatic-suspend path and the reversible roadmap toward SwayNC, Eww, and
+  improved locking.
 
 ### Maintenance and recovery
 
