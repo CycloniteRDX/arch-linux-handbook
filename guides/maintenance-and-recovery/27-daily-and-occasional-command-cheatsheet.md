@@ -969,6 +969,24 @@ sudo sbctl verify
 Do not run regeneration as a speculative fix. If it fails, do not reboot until
 both normal and fallback UKIs plus systemd-boot verify correctly.
 
+After post-install chapter 19, inspect the two Plymouth presentation policies:
+
+```bash
+grep '^HOOKS=' /etc/mkinitcpio.conf
+cat /etc/kernel/cmdline
+cat /etc/kernel/cmdline-fallback
+cat /etc/mkinitcpio.d/linux.preset
+plymouth-set-default-theme
+sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux.efi
+sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux-fallback.efi
+```
+
+The normal UKI must include `quiet splash`; the fallback must include neither
+and its preset must skip both `autodetect` and `plymouth`. During a normal
+Plymouth boot, press `Esc` to reveal detailed messages. If the graphical LUKS
+request is invisible or unusable, select the textual fallback UKI at the next
+systemd-boot menu instead of typing the passphrase blindly.
+
 ## Restic backup routine
 
 For disk identification, LUKS handling, recovery material, and restore drills,

@@ -29,11 +29,11 @@ This guide explains:
   recovery;
 - why this work precedes TPM2-bound unlocking and later visual polish.
 
-The handbook does not execute the described implementation. Publishing this
-article does not install Plymouth, alter `/etc/mkinitcpio.conf`, modify either
-kernel command line, rebuild or sign a UKI, change systemd-boot, enroll keys,
-or replace the current LUKS prompt. Those operational changes remain a future
-reviewed post-install improvement.
+The handbook does not execute the described implementation. The reviewed
+commands now live in chapter 19 of `arch-linux-post-install`; publishing this
+article alone does not install Plymouth, alter `/etc/mkinitcpio.conf`, modify
+either kernel command line, rebuild or sign a UKI, change systemd-boot, enroll
+keys, or replace the current LUKS prompt.
 
 Unless a section explicitly says otherwise, command examples run in Bash on
 the installed Arch system. Package-delivery commands run separately in
@@ -63,7 +63,8 @@ The current boot artifacts are:
 | `/boot/EFI/Linux/arch-linux-fallback.efi` | Broader UKI built without `autodetect` |
 | `/etc/mkinitcpio.conf` | Common initramfs hook policy |
 | `/etc/mkinitcpio.d/linux.preset` | Normal and fallback UKI output definitions |
-| `/etc/kernel/cmdline` | Kernel command line embedded in both current UKIs |
+| `/etc/kernel/cmdline` | Normal UKI command-line source after chapter 19 |
+| `/etc/kernel/cmdline-fallback` | Textual fallback UKI command-line source after chapter 19 |
 | `/var/lib/sbctl` | Secure Boot signing state and owner keys |
 | `/boot/loader/loader.conf` | Three-second menu, normal default, editor disabled |
 
@@ -78,14 +79,17 @@ rd.luks.name=<LUKS_UUID>=cryptlvm rd.luks.options=<LUKS_UUID>=discard zswap.enab
 never be replaced with the literal placeholder or copied from the second
 machine.
 
-Plymouth is currently deferred. The source has no `quiet` or `splash`, and the
-current hook sequence is:
+Before chapter 19, Plymouth is absent, the source has no `quiet` or `splash`,
+and the hook sequence is:
 
 ```text
 base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck
 ```
 
-That verbose state remains the known-good rollback baseline.
+That verbose state remains the known-good rollback baseline. Chapter 19 adds
+Plymouth to the common hook policy but uses the fallback preset's skip list to
+omit it from the fallback image. The normal source then gains `quiet splash`,
+while `/etc/kernel/cmdline-fallback` preserves the exact line shown above.
 
 ## Plymouth is a presentation layer, not another boot loader
 
@@ -248,8 +252,8 @@ configuration or theme feedback instead.
 | `disablehooks=plymouth` | Skip the mkinitcpio runtime hook when supported by that path |
 
 `splash` without `quiet` and `quiet` without Plymouth are possible, but neither
-is the intended polished result. The normal graphical UKI will eventually use
-both `quiet splash`.
+is the intended polished result. The normal graphical UKI uses both
+`quiet splash` after chapter 19.
 
 The project deliberately avoids adding a large “silent boot” bundle such as
 `loglevel=3`, `rd.udev.log_level=3`, `vt.global_cursor_default=0`, and multiple
@@ -424,15 +428,16 @@ For example, mkinitcpio supports a normal-only preset source such as:
 default_splash="/path/to/reviewed-image.bmp"
 ```
 
-The first Plymouth implementation will not add this. Firmware BGRT plus the
+The chapter 19 Plymouth implementation does not add this. Firmware BGRT plus the
 packaged theme already tests enough new boundaries. A custom UKI bitmap can be
 considered with the final visual language in guide 26, and should remain absent
 from the textual fallback UKI.
 
-## Proposed staged implementation
+## Staged implementation model
 
-This section records the future operational sequence. It is not an instruction
-to execute the changes merely because the handbook was published.
+This section explains the operational sequence implemented by post-install
+chapter 19. Use that chapter as the executable procedure and this guide for the
+architecture, alternatives, and diagnosis.
 
 ### 1. Capture the known-good state
 
@@ -853,12 +858,12 @@ entries.
 | Different initramfs generator | May offer its own integrations | Replaces a proven mkinitcpio architecture to solve an appearance problem |
 | Greeter theme | Improves login appearance | Starts only after encrypted root is already open |
 
-Plymouth is the recommended future implementation because it spans the exact
-phase containing the LUKS request while integrating with the existing systemd
+Plymouth is the selected implementation because it spans the exact phase
+containing the LUKS request while integrating with the existing systemd
 password-agent model. It is not selected because it has the most elaborate
 animations.
 
-## Decision checklist before implementation
+## Decision and validation checklist
 
 The operational change should not begin until every answer is explicit:
 
@@ -883,13 +888,13 @@ The operational change should not begin until every answer is explicit:
 
 The recorded design is:
 
-- Plymouth is the preferred future graphical early-boot layer;
-- publishing this guide does not install or enable it;
+- Plymouth is the selected graphical early-boot layer in post-install chapter 19;
+- the handbook explains it while the post-install chapter owns the changes;
 - the official Arch package and built-in `bgrt` theme form the first baseline;
 - no AUR theme, KDE control module, alternate initramfs generator, artificial
   animation delay, or broad silent-boot parameter bundle is introduced;
-- the normal UKI will include Plymouth and embed `quiet splash`;
-- the fallback UKI will skip Plymouth, retain broad modules, and embed a
+- the normal UKI includes Plymouth and embeds `quiet splash` after chapter 19;
+- the fallback UKI skips Plymouth, retains broad modules, and embeds a
   textual command line without `quiet splash`;
 - the normal and fallback sources preserve the same LUKS UUID, discard, zswap,
   root mapper, and read-write contract;
