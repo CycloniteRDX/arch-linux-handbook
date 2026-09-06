@@ -351,12 +351,18 @@ Test the cursor over:
 ### Fonts and icon fonts
 
 Text fonts, monospace fonts, emoji fonts, and icon fonts solve different
-problems. The existing Noto and Liberation base should remain. A Nerd Font may
-be added only if a reviewed Waybar or Eww design really uses its glyphs.
+problems. The existing Noto and Liberation base remains responsible for text.
+Post-install chapter 21 now adds `otf-font-awesome` and
+`ttf-nerd-fonts-symbols-mono` because the reviewed Waybar design really uses
+their glyphs. Its CSS names the corresponding `Font Awesome 7 Free` and
+`Symbols Nerd Font Mono` families explicitly.
 
 Every visible glyph creates a package dependency. A bar that silently relies
-on a font installed on only one ThinkPad is not reproducible. Prefer ordinary
-text or named theme icons when they communicate the state clearly.
+on a font installed on only one ThinkPad is not reproducible. The package
+installation therefore belongs in `arch-linux-post-install`, while the family
+fallback order belongs beside Waybar's CSS in `niri-dotfiles`. Verification
+must check both the Pacman packages and Fontconfig's resolved family names; a
+running Waybar process alone does not prove that its intended icons rendered.
 
 ## Wallpaper policy
 
@@ -1029,6 +1035,9 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   hardware-validated visual pass before a component replacement is considered.
 - Waybar is the first advanced personalization stage in post-install chapter
   21; Fuzzel and Mako follow while retaining their current roles.
+- Waybar's selected glyphs make `otf-font-awesome` and
+  `ttf-nerd-fonts-symbols-mono` explicit runtime dependencies; they are not
+  implicit workstation-local state.
 - SwayNotificationCenter is a later candidate that may replace Mako only in a
   transactional, independently validated experiment.
 - Eww remains a later bounded-dashboard candidate; it does not replace the
@@ -1065,6 +1074,8 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - [XDG Desktop Portal design](https://flatpak.github.io/xdg-desktop-portal/docs/design-considerations.html)
 - [ArchWiki: Icons](https://wiki.archlinux.org/title/Icons)
 - [ArchWiki: Cursor themes](https://wiki.archlinux.org/title/Cursor_themes)
+- [Arch package: otf-font-awesome](https://archlinux.org/packages/extra/any/otf-font-awesome/)
+- [Arch package: ttf-nerd-fonts-symbols-mono](https://archlinux.org/packages/extra/any/ttf-nerd-fonts-symbols-mono/)
 - [XDG Icon Theme Specification](https://specifications.freedesktop.org/icon-theme-spec/latest/)
 - [Niri: Important Software](https://niri-wm.github.io/niri/Important-Software.html)
 - [Desktop Notifications Specification](https://specifications.freedesktop.org/notification/latest/)
