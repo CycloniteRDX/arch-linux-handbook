@@ -197,7 +197,7 @@ Useful inspections are:
 
 ```bash
 systemd-analyze has-tpm2
-systemd-analyze identify-tpm2
+sudo systemd-analyze identify-tpm2
 systemd-analyze pcrs 7 11
 journalctl -b -k --grep='tpm|ima' --no-pager
 ```
@@ -549,7 +549,7 @@ TPM enrollment is blocked if the fallback or ISO path is untested.
 
 ```bash
 systemd-analyze has-tpm2
-systemd-analyze identify-tpm2
+sudo systemd-analyze identify-tpm2
 systemd-cryptenroll --tpm2-device=list
 systemd-analyze pcrs 7 11
 sudo sbctl status
@@ -642,10 +642,16 @@ second Secure Boot signing workflow to this file.
 PCRBanks=sha256
 
 [PCRSignature:initrd]
-Phases=enter-initrd
+Phases=enter-initrd enter-initrd:leave-initrd enter-initrd:leave-initrd:sysinit enter-initrd:leave-initrd:sysinit:ready
 PCRPrivateKey=/etc/systemd/tpm2-pcr-private-key-initrd.pem
 PCRPublicKey=/etc/systemd/tpm2-pcr-public-key-initrd.pem
 ```
+
+The root credential is requested at `enter-initrd`, but an enrollment command
+run after login observes PCR 11 after the later `leave-initrd`, `sysinit`,
+and `ready` extensions. Signing all four cumulative states with the same
+initrd-policy key preserves the early unlock policy while allowing
+`--tpm2-signature=` to perform its safety check from the fully booted system.
 
 After creating the file with root-only editing, generate the named pair:
 
@@ -672,13 +678,26 @@ Add the PCR private key and configuration to the encrypted sensitive recovery
 bundle. Losing it does not destroy the LUKS volume, but it prevents future UKI
 measurements from being authorized under the existing TPM token.
 
+ukify also documents a two-key pattern: one key for `enter-initrd` and another
+for later system phases. That separation is useful when different secrets are
+released at different stages. This profile seals only the root LUKS credential
+during initrd, so a second system-phase key would add lifecycle complexity
+without protecting another secret. The later signatures from the initrd key
+do not remove PCR 7, Secure Boot, or PIN authorization, and cannot match the
+earlier root-unlock state except through the separately signed
+`enter-initrd` path.
+
+Keep this `uki.conf` after enrollment so future UKI builds remain update-aware.
+Reducing it to only `enter-initrd` does not strengthen the actual early unlock
+and makes safe re-enrollment from a fully booted system harder.
+
 ### Stage 6: rebuild, sign, and inspect both UKIs before enrollment
 
 ```bash
 sudo mkinitcpio -P
-sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text \
+sudo ukify --section=.pcrsig:text --section=.pcrpkey:text inspect \
     /boot/EFI/Linux/arch-linux.efi
-sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text \
+sudo ukify --section=.pcrsig:text --section=.pcrpkey:text inspect \
     /boot/EFI/Linux/arch-linux-fallback.efi
 sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux.efi
 sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux-fallback.efi
@@ -699,6 +718,10 @@ sudo sha256sum \
     /run/systemd/tpm2-pcr-public-key.pem \
     /etc/systemd/tpm2-pcr-public-key-initrd.pem
 ```
+
+That reboot is required: the files below `/run/systemd/` were exported by the
+UKI that started the current boot. Rebuilding a UKI or editing `uki.conf`
+cannot refresh them in place.
 
 The public-key hashes must match. Stop if the runtime files are absent or the
 keys differ. Do not enroll a public key whose current UKI signature cannot be
@@ -740,7 +763,7 @@ sudo systemd-cryptenroll /dev/nvme0n1p2 \
     --tpm2-device=auto \
     --tpm2-pcrs=7:sha256 \
     --tpm2-public-key=/etc/systemd/tpm2-pcr-public-key-initrd.pem \
-    --tpm2-public-key-pcrs=11:sha256 \
+    --tpm2-public-key-pcrs=11 \
     --tpm2-signature=/run/systemd/tpm2-pcr-signature.json \
     --tpm2-with-pin=yes
 ```
@@ -754,7 +777,7 @@ This command is intentionally explicit:
 | `--tpm2-device=auto` | Use the single audited TPM2 |
 | `--tpm2-pcrs=7:sha256` | Bind to the current Secure Boot policy state |
 | `--tpm2-public-key=...` | Enroll the dedicated PCR-policy public key |
-| `--tpm2-public-key-pcrs=11:sha256` | Accept UKI PCR 11 values signed by that key |
+| `--tpm2-public-key-pcrs=11` | Accept signed PCR 11 values; the signature policy already declares SHA-256 |
 | `--tpm2-signature=...` | Verify that a valid policy signature exists for the current boot before writing |
 | `--tpm2-with-pin=yes` | Require unique user presence at unlock |
 
@@ -765,6 +788,11 @@ replace `tpm2` with `password`, `recovery`, or `all`.
 Enter the existing strong LUKS passphrase when asked to authorize the header
 change, then create the unique TPM PIN. Stop on any warning about the device,
 PCR signature, public key, unsupported algorithm, or slot operation.
+
+On the systemd build validated for this ThinkPad, the signed-PCR option is a
+PCR mask and rejects `11:sha256`. This does not weaken the signed policy:
+`PCRBanks=sha256` and the `.pcrsig` metadata select SHA-256. The raw PCR 7
+option keeps its explicit `:sha256` bank.
 
 Immediately inspect without rebooting:
 
@@ -852,7 +880,7 @@ Before rebooting after boot-critical updates:
 
 ```bash
 sudo mkinitcpio -P
-sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text \
+sudo ukify --section=.pcrsig:text --section=.pcrpkey:text inspect \
     /boot/EFI/Linux/arch-linux.efi
 sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux.efi
 sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux-fallback.efi
@@ -937,7 +965,7 @@ Useful evidence after a passphrase recovery boot:
 cat /proc/cmdline
 bootctl status
 sudo bootctl kernel-inspect /boot/EFI/Linux/arch-linux.efi
-sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text \
+sudo ukify --section=.pcrsig:text --section=.pcrpkey:text inspect \
     /boot/EFI/Linux/arch-linux.efi
 sudo test -r /run/systemd/tpm2-pcr-signature.json
 sudo test -r /run/systemd/tpm2-pcr-public-key.pem
@@ -954,6 +982,25 @@ Do not enable broad debug logging or paste a complete LUKS header dump before
 the normal bounded evidence is insufficient.
 
 ## Recovery scenarios
+
+### Enrollment cannot validate the current signed PCR state
+
+`Failed to unseal secret using TPM2: Device not a stream` during enrollment
+can occur when the UKI contains a signature for `enter-initrd` but the
+enrollment safety check runs after PCR 11 has progressed to `ready`. Inspect
+the LUKS inventory first. Then sign all four cumulative phase paths documented
+above with the existing initrd-policy key, rebuild both UKIs, cold boot the
+normal image, and compare the runtime and local public-key hashes. Adding
+phases does not require deleting or regenerating the key pair.
+
+### Signed-PCR mask rejects an explicit bank
+
+The validated systemd build rejects
+`--tpm2-public-key-pcrs=11:sha256` with `Not expecting hash algorithm
+specification in PCR mask value`. Use `--tpm2-public-key-pcrs=11`. The
+signed policy still uses SHA-256 through `PCRBanks=sha256` and its
+`.pcrsig` metadata; keep `--tpm2-pcrs=7:sha256` for the separate raw PCR 7
+binding.
 
 ### PCR mismatch after an intended update
 
@@ -1154,7 +1201,8 @@ The recorded design is:
   remote attestation remain advanced alternatives rather than first steps;
 - clearing the TPM is not routine enrollment, update, rollback, or recovery;
 - the handbook explains the design, while post-install chapter 20 contains the
-  reviewed procedure and awaits hardware validation.
+  reviewed procedure whose hardware validation is in progress as of
+  2026-09-06.
 
 ## Further deductions
 

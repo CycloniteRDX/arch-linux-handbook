@@ -992,9 +992,10 @@ policy without changing it:
 
 ```bash
 systemd-analyze has-tpm2
+sudo systemd-analyze identify-tpm2
 systemd-analyze pcrs 7 11
 sudo systemd-cryptenroll /dev/nvme0n1p2
-sudo ukify inspect --section=.pcrsig:text --section=.pcrpkey:text /boot/EFI/Linux/arch-linux.efi
+sudo ukify --section=.pcrsig:text --section=.pcrpkey:text inspect /boot/EFI/Linux/arch-linux.efi
 sudo test -s /run/systemd/tpm2-pcr-signature.json
 sudo test -s /run/systemd/tpm2-pcr-public-key.pem
 sudo sbctl verify
