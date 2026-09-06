@@ -29,8 +29,10 @@ The project decision is now explicit:
 
 - build a personal modular desktop around Niri;
 - keep the existing small components as a working recovery baseline;
-- replace one role at a time, with an ownership table and rollback for every
-  migration.
+- complete one visual pass across the existing components before replacing
+  any role;
+- later replace at most one role at a time, with an ownership table and
+  rollback for every migration.
 
 The project does not carry a complete-shell migration in its roadmap. This
 guide assumes a clean Arch installation built through the runbook,
@@ -45,17 +47,18 @@ this project rather than a monolithic shell product.
 | Role | Initial owner | Intended evolution |
 | --- | --- | --- |
 | Compositor, outputs, workspaces, input | Niri | Keep |
-| Bar and compact status | Waybar | Restyle first; replace only if an Eww bar later proves worthwhile |
+| Bar and compact status | Waybar | Complete and validate its first advanced restyle in post-install chapter 21 |
 | Application launcher | Fuzzel | Restyle and keep until a concrete capability is missing |
-| Notification service | Mako | Replace experimentally with SwayNotificationCenter |
-| Notification history and control panel | None beyond Mako tools | Add through SwayNotificationCenter |
-| Wallpaper renderer | swaybg | Keep initially; wrap or replace only for desired transitions or per-output behavior |
+| Notification service | Mako | Restyle and validate before comparing SwayNotificationCenter |
+| Notification history and control panel | Mako tools only | Accept during the first pass; compare SwayNotificationCenter later |
+| Wallpaper renderer | swaybg | Restyle and validate before comparing transition or per-output tools |
 | Qt 6 appearance | qt6ct with Fusion | Keep as the sole Qt 6 widget-theme owner; evaluate exceptions per application |
-| Screen locker | swaylock | Restyle first, then compare hyprlock or gtklock |
+| Screen locker | swaylock | Restyle and validate before comparing hyprlock or gtklock |
 | Idle and pre-sleep coordination | swayidle | Keep as sole owner; call the reviewed battery-aware helper at 30 minutes |
-| Custom dashboard and widgets | None | Introduce Eww for one bounded surface at a time |
+| Custom dashboard and widgets | None | Defer Eww until the existing desktop completes its visual pass |
 | Login manager | greetd | Keep |
-| Login presentation | tuigreet | Keep as the selected and proven frontend |
+| Login presentation | tuigreet | Restyle near the end of the first pass while preserving TTY recovery |
+| Early-boot presentation | Plymouth | Restyle last, after the session and login language are stable |
 | Hardware power policy | TLP plus `tlp-pd` | Keep; no shell may introduce a second provider |
 
 The table is a dependency contract, not merely a list of preferred programs.
@@ -397,7 +400,7 @@ turns an image change into a broad configuration change. Start with one fixed,
 reviewed palette; automate derivation only after every consumer and rollback
 path is understood.
 
-## Notifications: Mako, SwayNC, and Eww
+## Notifications: preserve Mako before comparing replacements
 
 ### Mako remains a sound baseline
 
@@ -405,14 +408,14 @@ Mako is still a good notification daemon for a modular Niri desktop. It is
 small, implements the FreeDesktop notification service, supports actions and
 urgency, and exposes history through `makoctl`.
 
-Its limitation for this project is not correctness. It is the absence of the
-large, persistent, integrated notification and quick-control panel the user
-wants.
+Its limitation for this project is not correctness. It lacks a large,
+persistent notification and quick-control panel, but that missing capability
+does not block completing the current desktop's first visual pass.
 
-### SwayNotificationCenter is the selected first replacement experiment
+### SwayNotificationCenter remains a later replacement candidate
 
 SwayNotificationCenter combines a notification daemon with a GTK control
-center. That makes it a real Mako replacement and a useful intermediate step:
+center. That makes it a real Mako replacement and a useful later experiment:
 
 - the project learns the D-Bus notification boundary;
 - a persistent history becomes visible;
@@ -420,7 +423,10 @@ center. That makes it a real Mako replacement and a useful intermediate step:
 - Waybar can remain while notification presentation evolves;
 - CSS can share the project palette.
 
-It must not run beside Mako. The migration transaction is:
+It is not installed during the first personalization pass and must never run
+beside Mako. After the current Waybar, Fuzzel, Mako, swaylock, wallpaper, Niri,
+toolkit, tuigreet, and Plymouth presentation is validated, a future migration
+may use this transaction:
 
 1. install SwayNC without permanent startup;
 2. stop Mako temporarily inside a test session;
@@ -451,7 +457,7 @@ Eww can build a beautiful panel, history view, or notification-related widget.
 It does not automatically own `org.freedesktop.Notifications`, receive all
 notification methods, store actions, or implement the protocol lifecycle.
 
-The selected architecture is therefore:
+One possible later architecture is therefore:
 
 - SwayNC receives and owns notifications;
 - Eww may later display complementary state or open the SwayNC panel;
@@ -788,11 +794,12 @@ helpers are easier to test and replace.
 
 ## Implementation phases and current progress
 
-After the visual and Qt foundations, these phases are independent migration
-tracks rather than a strict calendar. Automatic suspend was ready to implement
-as chapter 18 because its owner, policy, rollback, and tests were already
-closed. SwayNC, Eww, and a possible locker replacement still require separate
-visual and interaction choices, so they do not block the power-policy change.
+After the visual and Qt foundations, the project first completes a deliberate
+pass across every current component. These stages are ordered so ordinary
+session surfaces come before authentication and early boot. A replacement
+phase begins only after the existing stack is visually coherent and
+hardware-validated. Automatic suspend was implemented independently in chapter
+18 because its owner, policy, rollback, and tests were already closed.
 
 ### Phase 0 — establish the clean modular baseline
 
@@ -841,33 +848,49 @@ This produces a coherent desktop before changing protocol owners.
 This is a separate reversible post-install chapter because the GTK visual
 foundation does not require Qt infrastructure.
 
-### Phase 2 — richer notifications
+### Phase 2 — personalize every current component
 
-1. compare SwayNC manually with the current Mako behavior;
-2. design and test the panel, actions, do-not-disturb, and history;
-3. replace Mako transactionally;
-4. integrate one Waybar button or Fuzzel action to open the center;
-5. test GNOME Calendar reminders and critical notifications after a new login.
+Use separate post-install chapters and dotfiles checkpoints in this order:
 
-### Phase 3 — custom Eww dashboard
+1. refine Waybar's geometry, hierarchy, states, and existing actions;
+2. refine Fuzzel without replacing the application launcher;
+3. refine Mako while it remains the sole notification daemon;
+4. refine swaylock without changing PAM or any lock path;
+5. refine swaybg and wallpaper presentation while retaining one renderer;
+6. tune Niri's window, overview, and motion presentation without adding output
+   overrides;
+7. reconcile Kitty, GTK, and Qt details after every shell surface has a stable
+   visual language;
+8. restyle tuigreet while preserving greetd, PAM, and TTY3 recovery;
+9. restyle Plymouth last while preserving the textual fallback UKI;
+10. validate the complete sequence and publish one stable dotfiles release.
 
-1. create one toggleable dashboard;
-2. add data sources one at a time;
-3. prefer event streams over rapid polling;
-4. implement unavailable and error states;
-5. measure idle CPU, wakeups, and memory;
-6. keep Waybar and Fuzzel until the dashboard is stable.
+Post-install chapter 21 implements the first item. Each later stage changes one
+surface, proves rollback, and leaves every other owner in place.
 
-### Phase 4 — improved lock screen
+### Phase 3 — validate the complete existing stack
 
-1. fully style swaylock first;
-2. compare hyprlock and gtklock only if swaylock cannot express the desired
-   result;
-3. validate PAM and the session-lock protocol;
-4. replace every lock path as one coordinated change;
-5. repeat multi-output and suspend/resume testing.
+Repeat the full startup, output, toolkit, notification, locker, idle, resume,
+logout, recovery, and resource matrix. Compare the complete system rather than
+judging isolated screenshots. Only this phase may declare the first fully
+personalized desktop and publish its semantic dotfiles release.
 
-### Phase 5 — automatic session suspend (chapter 18)
+### Phase 4 — compare optional replacements
+
+Only after phase 3:
+
+1. compare SwayNotificationCenter with the validated Mako behavior;
+2. compare another wallpaper renderer only for a concrete missing capability;
+3. introduce one bounded Eww dashboard if maintaining custom widgets is still
+   desirable;
+4. compare a different locker only if styled swaylock remains insufficient;
+5. decide whether any replacement earns its dependency, recovery, and
+   maintenance cost.
+
+The existing owner remains the baseline during each experiment. Exclusive
+protocol owners are never started together.
+
+### Completed independent track — automatic session suspend (chapter 18)
 
 1. add battery-source detection with a fail-closed helper;
 2. validate both power-source branches without sleeping;
@@ -878,7 +901,7 @@ foundation does not require Qt infrastructure.
 7. force the complete event chain with swayidle's documented signal;
 8. observe the real timers before considering automatic suspend on AC.
 
-### Phase 6 — post-logout idle with tuigreet
+### Separate functional track — post-logout idle with tuigreet
 
 1. retain the current greetd and tuigreet configuration;
 2. preserve TTY3 recovery;
@@ -886,7 +909,7 @@ foundation does not require Qt infrastructure.
 4. prove login, keyring unlock, logout return, and repeated sessions;
 5. only then decide whether post-logout automatic suspend is justified.
 
-### Phase 7 — decide whether Eww should replace Waybar
+### Later decision — whether Eww should replace Waybar
 
 By this point the project will know the actual cost of custom widgets. Replace
 Waybar only if the desired bar behavior justifies maintaining Niri workspace,
@@ -1002,11 +1025,15 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - No complete-shell migration is part of the installation or roadmap.
 - The existing Waybar/Fuzzel/Mako/swaybg/swaylock/swayidle stack remains the
   reproducible recovery baseline while the modular desktop evolves.
-- Waybar and Fuzzel are styled before any replacement is considered.
-- SwayNC is the first selected protocol-owner experiment and may replace Mako.
-- Eww begins as a bounded dashboard; it does not replace the notification
-  daemon, locker, idle coordinator, or system services.
-- swaylock is styled first; hyprlock and gtklock remain later candidates.
+- Every existing surface, including tuigreet and Plymouth, completes one
+  hardware-validated visual pass before a component replacement is considered.
+- Waybar is the first advanced personalization stage in post-install chapter
+  21; Fuzzel and Mako follow while retaining their current roles.
+- SwayNotificationCenter is a later candidate that may replace Mako only in a
+  transactional, independently validated experiment.
+- Eww remains a later bounded-dashboard candidate; it does not replace the
+  notification daemon, locker, idle coordinator, or system services.
+- swaylock is styled before hyprlock or gtklock is compared.
 - swayidle remains the first coordinator for lock, monitor power, pre-sleep,
   and the new automatic-suspend stage.
 - The initial automatic-suspend policy is 30 minutes on battery only, after
@@ -1015,6 +1042,8 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - Post-logout automatic suspend is a separate greeter/logind project because
   user-session timers end at logout.
 - greetd remains the login manager and tuigreet remains the selected frontend.
+- Plymouth is restyled only after session and login presentation are stable;
+  the independent textual fallback UKI remains outside the theme.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
 - qt6ct plus Fusion is the sole Qt 6 widget-appearance path; Niri exports only
   `QT_QPA_PLATFORMTHEME=qt6ct`, while Qt retains automatic platform selection.

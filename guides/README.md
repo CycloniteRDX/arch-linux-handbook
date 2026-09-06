@@ -120,9 +120,10 @@ only when its first reviewed article is ready.
 - [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
   selects a personal modular Niri desktop, separates themes, icons, cursors,
   wallpapers, Qt 6 appearance, notifications, widgets, locking, the stable
-  tuigreet boundary, and idle ownership; it records the selected battery-aware
-  automatic-suspend path and the reversible roadmap toward SwayNC, Eww, and
-  improved locking.
+  tuigreet boundary, Plymouth presentation, and idle ownership; it records the
+  selected battery-aware automatic-suspend path, the current-component
+  personalization sequence, and the later reversible roadmap toward optional
+  SwayNC, Eww, wallpaper, and locker experiments.
 
 ### Maintenance and recovery
 
