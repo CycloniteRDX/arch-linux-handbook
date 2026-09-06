@@ -364,7 +364,7 @@ Secure Boot verification and TPM measurement are different operations:
   matches.
 
 The frozen installation baseline uses a manual LUKS passphrase and does not
-bind unlocking to TPM2 PCRs. Post-install chapter 20 may add that route only
+bind unlocking to TPM2 PCRs. Post-install chapter 20 adds that route only
 through guide 25's explicit recovery, PCR, update, and resealing policy.
 Secure Boot being enabled is not enough to design TPM unlock safely.
 

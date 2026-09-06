@@ -31,11 +31,12 @@ This guide explains:
 - where `systemd-pcrlock` fits and why it is not the first implementation.
 
 The ordered implementation now lives in chapter 20 of
-`arch-linux-post-install`. Publishing or reading this article does not install
-TPM packages, create keys, change either UKI, edit a kernel command line, add
-or remove a LUKS keyslot, enroll the TPM, change a PIN, clear the TPM, or alter
-Secure Boot. Use the post-install chapter's checkpoints rather than treating
-the illustrative commands below as one block.
+`arch-linux-post-install` and passed hardware validation on the target
+ThinkPad T14 Gen 1 AMD on 2026-09-06. Publishing or reading this article does
+not install TPM packages, create keys, change either UKI, edit a kernel command
+line, add or remove a LUKS keyslot, enroll the TPM, change a PIN, clear the TPM,
+or alter Secure Boot. Use the post-install chapter's checkpoints rather than
+treating the illustrative commands below as one block.
 
 Unless stated otherwise, examples run in Bash on the installed Arch system.
 Package-delivery commands run separately in PowerShell on Windows.
@@ -1201,8 +1202,7 @@ The recorded design is:
   remote attestation remain advanced alternatives rather than first steps;
 - clearing the TPM is not routine enrollment, update, rollback, or recovery;
 - the handbook explains the design, while post-install chapter 20 contains the
-  reviewed procedure whose hardware validation is in progress as of
-  2026-09-06.
+  reviewed procedure that passed hardware validation on 2026-09-06.
 
 ## Further deductions
 

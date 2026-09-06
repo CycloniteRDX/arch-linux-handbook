@@ -923,4 +923,4 @@ The recorded design is:
 - [`kernel-command-line(7)`](https://man.archlinux.org/man/kernel-command-line.7.en)
 
 Continue with guide 25 for the TPM2-bound LUKS design, then use post-install
-chapter 20 for its ordered implementation and hardware-validation checkpoints.
+chapter 20 for its ordered, hardware-validated implementation and checkpoints.
