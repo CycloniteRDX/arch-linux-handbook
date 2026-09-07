@@ -16,14 +16,15 @@ On a laptop, that topology also meets a separate power policy:
 - WirePlumber independently chooses an HDMI or DisplayPort audio route;
 - applications and portals consume the resulting logical layout.
 
-This guide explains those boundaries and records a host-override design for
-the two ThinkPad T14 Gen 1 AMD installations. It does not yet activate a fixed
-mode or scale on either machine: only one internal panel has partial measured
-evidence, the second panel still needs a complete record, and no recurring
-external-display topology has been accepted.
+This guide explains those boundaries, records the first target's accepted
+internal-panel policy, and preserves the host-override design needed if the two
+ThinkPad T14 Gen 1 AMD machines differ. The first panel now has complete
+hardware evidence and a validated fixed mode, scale, and event-driven
+power-profile integration. The second panel still needs its own record, and no
+recurring external-display topology has been accepted.
 
-The portable Niri configuration therefore remains safe while the measurements
-are completed.
+The current chapter 22 checkpoint is therefore reproducible for the first
+target, not yet a portable output policy for both ThinkPads.
 
 ## Current project evidence
 
@@ -36,26 +37,27 @@ The evidence currently recorded is:
 
 | Item | Known state |
 | --- | --- |
-| Portable Niri file | Contains no active `output` block |
-| Internal connector seen on one T14 | `eDP-1` |
-| Reported native resolution | `1920x1080` |
-| Reported refresh timings | Approximately `60.049` Hz and `48.040` Hz |
-| Scale experiment | `1.5` was useful enough to consider, not yet canonical |
+| Current Niri file | Contains the first target's active `output "eDP-1"` block |
+| Validated internal connector | `eDP-1` |
+| Validated native resolution | `1920x1080` |
+| Advertised refresh timings | Exactly `60.049` Hz and `48.040` Hz |
+| Accepted scale | `1.25`, producing a logical 1536×864 rectangle |
+| Profile mapping | performance/balanced → 60.049 Hz; power-saver → 48.040 Hz |
+| Integration owner | Event-driven Python/GIO helper inside the Niri session |
 | Second T14 panel | Exact identity, modes, scale, and physical preference not yet recorded here |
 | External monitor topology | Still conditional and hardware-dependent |
-| Current default | Let Niri choose preferred mode, guessed scale, and automatic placement |
+| External-output default | Let Niri choose mode, scale, and automatic placement |
 
-The opening comment in the tracked configuration states this contract:
+The opening comment in the tracked configuration now states this boundary:
 
 ```kdl
-// Portable daily-driver configuration for the two ThinkPad installations.
-// Output modes and scale remain automatic until measured on each machine.
+// The eDP-1 mode and scale below are hardware-validated on the first target.
+// Recheck them before deploying this checkpoint on another panel or machine.
 ```
 
-This is not missing configuration. Niri automatically enables connected
-outputs, chooses a suitable mode and scale, and places outputs when no explicit
-rule overrides that behavior. Automatic operation is the correct baseline
-while evidence is incomplete.
+Niri still automatically enables and places other connected outputs because no
+external-output block overrides them. That automatic behavior remains the
+correct baseline until a repeated physical topology needs an explicit rule.
 
 ## The output model
 
@@ -245,14 +247,16 @@ energy rate over a long enough interval for noise to settle, then repeat the
 order on another run. One instantaneous `upower` value is not evidence of a
 real saving.
 
-The current project keeps 60 Hz or the preferred automatic mode as the normal
-interactive baseline. A 48 Hz battery policy remains an accepted future
-experiment, not part of TLP and not an implicit consequence of selecting
-`power-saver`.
+The first target now keeps 60.049 Hz for the `performance` and `balanced`
+profiles and uses 48.040 Hz only for explicit `power-saver`. This mapping
+passed real modeset and suspend/resume validation; it records an accepted
+behavior, not a quantified battery-life claim.
 
-TLP controls system power policy. Niri controls output timing. Connecting them
-requires an explicit, tested integration owner; neither program should poll
-and override the other through an improvised loop.
+TLP controls system power policy. Niri controls output timing. The selected
+`power-profile-refresh.py` helper owns only the connection between them: it
+observes `ActiveProfile` on the standard D-Bus interface supplied by
+`tlp-pd`, requests the advertised Niri mode, and reapplies it after logind's
+resume event. It does not poll, select profiles, write sysfs, or run as root.
 
 ## Physical pixels, logical pixels, and scale
 
@@ -600,11 +604,25 @@ brightness.
 
 ## Selected host-override architecture
 
+### Current first-target checkpoint
+
+Chapter 22 currently keeps the measured `eDP-1` block in the main
+`config.kdl` and the refresh helper beside it. This is a deliberate,
+hardware-validated checkpoint for one machine. It is not evidence that the
+second ThinkPad has the same panel.
+
+Before deploying that checkpoint on the second machine, compare its
+`niri msg outputs` report. If connector, exact modes, or preferred scale
+differs, keep using an earlier portable tag there until the host-package design
+below is implemented. Do not weaken the first target's reproducibility by
+silently editing the tracked values on only one clone.
+
 ### Goals
 
-The design must:
+The eventual two-machine design must:
 
-- retain one shared portable `config.kdl`;
+- restore one shared portable `config.kdl` after moving the first target's
+  active output block into its host package;
 - allow the two internal panels to use different exact timings or scales;
 - avoid runtime scripts that guess the machine from `$HOSTNAME`;
 - keep host selection explicit and reversible;
@@ -635,9 +653,9 @@ the configuration invalid.
 The include belongs at the end because includes are positional: later values
 can override earlier mergeable settings. Output sections themselves are
 multipart entries inserted as complete rules rather than merged field by
-field. The portable base must therefore continue to omit an `output "eDP-1"`
-block; duplicating the same output in the base and host file is invalid or
-ambiguous.
+field. The future portable base must therefore omit an `output "eDP-1"`
+block once the current first-target rule moves into a host file; duplicating
+the same output in the base and host file would be invalid or ambiguous.
 
 ### Two explicit Stow packages
 
@@ -947,8 +965,8 @@ the layer that failed.
 
 | Strategy | Advantage | Cost | Project choice |
 | --- | --- | --- | --- |
-| No output blocks | Maximum portability and robust first boot | Scale/placement may not match preference | Current baseline |
-| One shared output block | Simple | Assumes both panels and preferences are identical | Rejected |
+| No output blocks | Maximum portability and robust first boot | Scale/placement may not match preference | Historical portable checkpoint |
+| One shared output block | Simple | Assumes both panels and preferences are identical | Current first-target checkpoint, not a two-machine policy |
 | Local untracked `host.kdl` | Easy and private | Git cannot reconstruct it; relies only on backup | Fallback for sensitive identity, not primary design |
 | Explicit per-model Stow host packages | Reproducible, reviewable, selected intentionally | Requires two measured profiles and deployment step | Selected future design |
 | Hostname-detecting startup script | Automatic | Hidden branching, hostname coupling, more failure paths | Rejected |
@@ -961,12 +979,20 @@ software is added only for a topology that static rules cannot express well.
 
 ## Decisions recorded by this guide
 
-- The shared Niri configuration remains free of active output blocks today.
+- The current shared Niri file contains the first target's measured active
+  `eDP-1` block; this checkpoint is not yet portable across both ThinkPads.
 - The two T14 Gen 1 AMD laptops are not assumed to contain identical panels.
-- `1920x1080@60.049`, `1920x1080@48.040`, and the scale 1.5 experiment are
-  evidence from one machine, not values for both.
+- `1920x1080@60.049`, `1920x1080@48.040`, and scale 1.25 are accepted
+  values for the first measured machine, not values for both.
 - Exact refresh digits come from `niri msg outputs`; custom modes and modelines
   are not used for advertised laptop timings.
+- TLP remains the power-policy owner. The session helper observes `tlp-pd`:
+  performance and balanced select 60.049 Hz, while power-saver selects 48.040
+  Hz; logind's resume event triggers reapplication.
+- The refresh helper is event-driven, does not poll, does not choose a TLP
+  profile, and changes no external output.
+- The 48.040 Hz choice is validated behavior, not a quantified battery-life
+  claim.
 - Scale is chosen from ergonomics and application testing after measuring each
   machine, not from PPI alone.
 - Output positions use logical dimensions after scale and transform.
@@ -983,17 +1009,17 @@ software is added only for a topology that static rules cannot express well.
 - No hostname-detection script or public EDID serial is part of the design.
 - Kanshi remains deferred until a repeated connection-dependent topology
   demonstrates the need for profiles.
-- The possible 48 Hz battery mode remains a measured future experiment and is
-  not coupled to TLP today.
+- The second ThinkPad measurement decides whether the current output block
+  moves into the planned host packages.
 
 ## Completion checklist
 
-- [ ] Both ThinkPads have separate private output records.
-- [ ] Connector, EDID metadata, exact modes, scale, and logical dimensions are recorded.
+- [ ] Both ThinkPads have separate private output records; the first is complete.
+- [x] The first target's connector, exact modes, scale, and logical dimensions are recorded.
 - [ ] Hardware serials remain outside the public repositories.
-- [ ] Scale candidates have been tested with native Wayland and XWayland applications.
-- [ ] The chosen refresh mode has passed repeated suspend/resume tests.
-- [ ] Any claimed 48 Hz battery benefit is based on controlled measurement.
+- [x] Scale 1.25 has been accepted with the first target's daily applications.
+- [x] Both selected refresh modes and reapplication after resume are validated.
+- [x] No unmeasured battery-life improvement is claimed.
 - [ ] Logical coordinates are calculated after scale and transform.
 - [ ] Cursor adjacency matches the physical monitor arrangement.
 - [ ] Hot-plug preserves access to all windows and workspaces.
@@ -1001,7 +1027,7 @@ software is added only for a topology that static rules cannot express well.
 - [ ] External audio is tested separately through PipeWire/WirePlumber.
 - [ ] Lid-close behavior passes alone, on AC, on battery, and with an external display.
 - [ ] No duplicate lid or display-power script competes with Niri and logind.
-- [ ] The portable base remains valid with no host file.
+- [ ] A future two-host split restores an automatic portable base with no active output block.
 - [ ] Only one future host Stow package is deployed per machine.
 - [ ] Kanshi remains absent unless a documented repeated topology needs it.
 - [ ] TTY3 and automatic-output fallback are understood before activating overrides.
@@ -1017,6 +1043,8 @@ software is added only for a topology that static rules cannot express well.
 - [Niri: fractional layout](https://niri-wm.github.io/niri/Development:-Fractional-Layout.html)
 - [Niri: layout](https://niri-wm.github.io/niri/Configuration:-Layout.html)
 - [Niri IPC](https://niri-wm.github.io/niri/IPC.html)
+- [TLP: power-profiles-daemon compatibility](https://linrunner.de/tlp/faq/ppd.html)
+- [Gio.DBusProxy](https://docs.gtk.org/gio/class.DBusProxy.html)
 - [kanshi(5)](https://man.archlinux.org/man/kanshi.5.en)
 - [systemd-logind.service(8)](https://man.archlinux.org/man/systemd-logind.service.8.en)
 - [logind.conf(5)](https://man.archlinux.org/man/logind.conf.5.en)

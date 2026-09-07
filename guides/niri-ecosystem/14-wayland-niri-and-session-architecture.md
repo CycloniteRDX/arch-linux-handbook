@@ -340,9 +340,11 @@ application actually publishes.
 
 ## Outputs, modes, scale, and logical coordinates
 
-The portable dotfiles deliberately omit output blocks until both ThinkPads and
-their external-display use have been measured. Niri can select preferred modes
-and place outputs automatically, so an absent block is a valid baseline.
+The chapter 22 dotfiles contain the first target's measured internal
+`eDP-1` block. That is a hardware-specific checkpoint, not a claim that both
+ThinkPads share a panel. External outputs remain automatic, and the earlier
+chapter 13 tag remains the portable no-output-rule baseline while the second
+machine is measured.
 
 Inspect the real state inside the session:
 

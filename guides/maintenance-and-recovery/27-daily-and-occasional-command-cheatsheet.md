@@ -1180,23 +1180,41 @@ intentional, then review `git diff`.
 
 | Shortcut | Action |
 | --- | --- |
-| `Super+Enter` | Open Kitty. |
+| `Super+T` or `Super+Enter` | Open Kitty. |
 | `Super+D` | Open Fuzzel. |
 | `Super+O` | Toggle the Niri overview. |
 | `Super+Q` | Close the focused window. |
-| `Super+Alt+L` | Lock with swaylock. |
+| `Super+Shift+L` | Lock with swaylock. |
 | `Super+Shift+/` | Show Niri's important-shortcut overlay. |
-| `Super+Page Up/Down` | Change workspace. |
-| `Super+Ctrl+Page Up/Down` | Move the focused column to another workspace. |
+| `Super+H/J/K/L` | Move focus left/down/up/right. |
+| `Super+Alt+H/J/K/L` | Move the focused window or column. |
+| `Super+Ctrl+J/K` | Change workspace down/up. Caps Lock also acts as Ctrl. |
+| `Super+Ctrl+Alt+J/K` | Move the focused column to another workspace. |
+| `Super+1…9` | Focus a numbered workspace. |
+| `Super+Alt+1…9` | Move the focused column to a numbered workspace. |
 | `Super+R` | Cycle column widths. |
 | `Super+F` | Maximize the focused column. |
-| `Super+Shift+F` | Toggle fullscreen. |
+| `Super+Alt+F` | Toggle fullscreen. |
 | `Super+V` | Toggle floating. |
 | `Super+W` | Toggle tabbed display for the column. |
 | `Print` | Interactive screenshot. |
 | `Ctrl+Print` | Screenshot the focused output. |
 | `Alt+Print` | Screenshot the focused window. |
 | `Super+Shift+E` | Exit Niri through its confirmation dialog. |
+
+The first target uses right Alt as Compose, Caps Lock as Ctrl, and
+`eDP-1` at scale 1.25. Check the current TLP profile and internal-panel
+refresh together with:
+
+```bash
+tlpctl get
+niri msg outputs
+pgrep -af '[p]ower-profile-refresh.py'
+```
+
+`performance` and `balanced` use 60.049 Hz; explicit `power-saver` uses
+48.040 Hz. Those exact values are validated only for the first measured
+ThinkPad.
 
 ### Clipboard, notifications, and default applications
 

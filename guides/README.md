@@ -116,7 +116,8 @@ only when its first reviewed article is ready.
 - [Niri outputs, scaling, external displays, and host overrides](niri-ecosystem/17-niri-outputs-scaling-and-host-overrides.md)
   explains connectors and display identity, modes and refresh rates, physical
   versus logical pixels, fractional scaling, coordinates, hot-plug, lid
-  behavior, workspace migration, and a portable per-ThinkPad override design.
+  behavior, workspace migration, the first target's validated adaptive-refresh
+  policy, and the remaining per-ThinkPad override boundary.
 - [Desktop polish, modular-shell architecture, and automatic suspend](niri-ecosystem/26-desktop-polish-modular-shell-and-automatic-suspend.md)
   selects a personal modular Niri desktop, separates themes, icons, cursors,
   wallpapers, Qt 6 appearance, notifications, widgets, locking, the stable

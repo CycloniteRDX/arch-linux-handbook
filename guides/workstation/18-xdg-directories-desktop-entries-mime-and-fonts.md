@@ -34,7 +34,7 @@ The published system has this baseline:
 | --- | --- |
 | System locale | `LANG=en_US.UTF-8` |
 | Console keyboard | `KEYMAP=us` or `KEYMAP=es`, selected per physical keyboard |
-| Portable Niri keyboard | `xkb { layout "us" }` until the host-override design is implemented |
+| Niri keyboard | `us`, right Alt Compose, and Caps Lock mapped to Ctrl in the validated chapter 22 checkpoint |
 | User directories | English names: `Desktop`, `Documents`, `Downloads`, `Music`, `Pictures`, `Public`, `Templates`, and `Videos` |
 | User configuration root | Default `$XDG_CONFIG_HOME`, normally `~/.config` |
 | Default applications | Tracked in `mimeapps/.config/mimeapps.list` and deployed by GNU Stow |
@@ -43,7 +43,7 @@ The published system has this baseline:
 | Emoji font | Noto Color Emoji |
 | Document compatibility | Liberation Sans, Serif, and Mono |
 | CJK coverage | Optional `noto-fonts-cjk`, not part of the required baseline |
-| Nerd Fonts | Deferred until a real icon or theme requirement is accepted |
+| Icon glyph fonts | `otf-font-awesome` and the narrow `ttf-nerd-fonts-symbols-mono` package for Waybar |
 
 The separation is deliberate. One ThinkPad can use a Spanish physical
 keyboard while retaining English messages and English directory names. A
@@ -806,7 +806,7 @@ dotfiles request:
 | Component | Request |
 | --- | --- |
 | Kitty | `Noto Sans Mono` |
-| Waybar | `Noto Sans`, then generic `sans-serif` |
+| Waybar | `Noto Sans`, `Font Awesome 7 Free`, `Symbols Nerd Font Mono`, then generic `sans-serif` |
 | Fuzzel | `Noto Sans` |
 | Mako | `Noto Sans` |
 | swaylock | `Noto Sans` |
@@ -816,11 +816,16 @@ emoji; Liberation supplies metric-compatible document families. CJK coverage
 is optional because `noto-fonts-cjk` is substantially larger and is not needed
 for the canonical English and Spanish use case.
 
-The baseline deliberately does not require a Nerd Font. Current Waybar labels
-work without making private-use icon glyphs a dependency. If the accepted
-future theme or modular shell needs icon glyphs, select the minimum maintained
-package, record the exact family in dotfiles, and verify fallback then. Do not
-install every Nerd Font preemptively.
+Post-install chapter 21 makes two narrow icon families explicit:
+`otf-font-awesome` supplies `Font Awesome 7 Free`, while
+`ttf-nerd-fonts-symbols-mono` supplies `Symbols Nerd Font Mono`. The
+tracked Waybar CSS names both, and its brightness scale consumes private-use
+glyphs from the latter. This is an intentional runtime dependency rather than
+an incidental locally installed font.
+
+The project still does not install a complete patched programming font or
+every Nerd Font. Select the minimum maintained package, record its exact family
+beside the consumer, and verify Fontconfig resolution.
 
 ### Inspect selection and coverage
 
@@ -1150,8 +1155,8 @@ reset is not a substitute for a migration or a backup.
   window identity as separate layers.
 - Use Noto Sans for the visible desktop, Noto Sans Mono for Kitty, Noto Color
   Emoji for emoji, and Liberation for document compatibility.
-- Keep CJK coverage optional and Nerd Fonts deferred until an accepted design
-  demonstrates the need.
+- Keep CJK coverage optional; install only the two accepted Waybar icon
+  families rather than every Nerd Font.
 - Version source configuration, not Fontconfig, thumbnail, MIME, launcher, or
   runtime caches.
 - Keep credentials, histories, recent-file records, browser profiles, keyrings,

@@ -501,8 +501,9 @@ These actions have different scopes:
 | `systemctl reboot` | Stop the whole operating system and boot again |
 | `systemctl poweroff` | Stop and power off the machine |
 
-The Waybar session control currently invokes Niri's quit action. That is a
-graphical logout, not a reboot and not the future automatic-idle action.
+The current Waybar deliberately has no session-control module. Niri's
+`Super+Shift+E` binding invokes its quit action. That is a graphical logout,
+not a reboot and not the automatic-idle action.
 
 When Niri exits normally, `niri-session` coordinates its user graphical target
 shutdown and returns. greetd notices that the authenticated session command

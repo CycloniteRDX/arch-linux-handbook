@@ -560,7 +560,7 @@ independent explicit paths.
 The Niri binding includes:
 
 ```kdl
-Super+Alt+L allow-inhibiting=false {
+Mod+Shift+L allow-inhibiting=false {
     spawn "swaylock" "-f"
 }
 ```
@@ -693,7 +693,8 @@ swaylock -f
 ```
 
 There should be one swayidle process. Verify that a wrong password fails and
-the account password unlocks. Then use `Super+Alt+L` and verify the same path.
+the account password unlocks. Then use `Super+Shift+L` and verify the same
+path.
 
 ### 7. Test suspend behind the lock
 

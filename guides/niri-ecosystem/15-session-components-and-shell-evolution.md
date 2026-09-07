@@ -153,9 +153,11 @@ change spacing, typography, colors, borders, hover state, warnings, and
 critical-state presentation. It cannot add a missing backend capability or
 turn a bar into a notification daemon.
 
-The current text labels deliberately work without a Nerd Font. A future icon
-theme can be added, but the font package and every glyph must be tracked rather
-than assuming another machine already contains them.
+The chapter 21 Waybar design now uses icon glyphs deliberately. Its CSS names
+`Font Awesome 7 Free` and `Symbols Nerd Font Mono`, supplied by the
+official `otf-font-awesome` and `ttf-nerd-fonts-symbols-mono` packages.
+The narrow dependency is tracked and verified rather than assuming another
+machine already contains the fonts.
 
 ### Verification
 

@@ -46,8 +46,8 @@ this project rather than a monolithic shell product.
 
 | Role | Initial owner | Intended evolution |
 | --- | --- | --- |
-| Compositor, outputs, workspaces, input | Niri | Keep |
-| Bar and compact status | Waybar | Complete and validate its first advanced restyle in post-install chapter 21 |
+| Compositor, outputs, workspaces, input | Niri | First-target v1 complete and validated in post-install chapter 22; keep |
+| Bar and compact status | Waybar | First advanced restyle complete and validated in post-install chapter 21; keep |
 | Application launcher | Fuzzel | Restyle and keep until a concrete capability is missing |
 | Notification service | Mako | Restyle and validate before comparing SwayNotificationCenter |
 | Notification history and control panel | Mako tools only | Accept during the first pass; compare SwayNotificationCenter later |
@@ -430,7 +430,7 @@ center. That makes it a real Mako replacement and a useful later experiment:
 - CSS can share the project palette.
 
 It is not installed during the first personalization pass and must never run
-beside Mako. After the current Waybar, Fuzzel, Mako, swaylock, wallpaper, Niri,
+beside Mako. After the current Waybar, Niri, Fuzzel, Mako, swaylock, wallpaper,
 toolkit, tuigreet, and Plymouth presentation is validated, a future migration
 may use this transaction:
 
@@ -858,20 +858,25 @@ foundation does not require Qt infrastructure.
 
 Use separate post-install chapters and dotfiles checkpoints in this order:
 
-1. refine Waybar's geometry, hierarchy, states, and existing actions;
-2. refine Fuzzel without replacing the application launcher;
-3. refine Mako while it remains the sole notification daemon;
-4. refine swaylock without changing PAM or any lock path;
-5. refine swaybg and wallpaper presentation while retaining one renderer;
-6. tune Niri's window, overview, and motion presentation without adding output
-   overrides;
+1. refine Waybar's geometry, hierarchy, states, and existing actions — complete
+   and hardware-validated in chapter 21;
+2. finish Niri's first-target input, window, overview, motion, output, and
+   adaptive-refresh policy — moved forward, complete, and hardware-validated
+   in chapter 22;
+3. refine Fuzzel without replacing the application launcher — next;
+4. refine Mako while it remains the sole notification daemon;
+5. refine swaylock without changing PAM or any lock path;
+6. refine swaybg and wallpaper presentation while retaining one renderer;
 7. reconcile Kitty, GTK, and Qt details after every shell surface has a stable
    visual language;
 8. restyle tuigreet while preserving greetd, PAM, and TTY3 recovery;
 9. restyle Plymouth last while preserving the textual fallback UKI;
 10. validate the complete sequence and publish one stable dotfiles release.
 
-Post-install chapter 21 implements the first item. Each later stage changes one
+Chapters 21 and 22 implement the first two items. Niri moved forward because
+its input and refresh behavior was refined alongside Waybar, but the
+checkpoints remain separate: chapter 21 is the last Waybar-only commit and
+chapter 22 is the cumulative finished session. Each later stage changes one
 surface, proves rollback, and leaves every other owner in place.
 
 ### Phase 3 — validate the complete existing stack
@@ -1034,7 +1039,12 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - Every existing surface, including tuigreet and Plymouth, completes one
   hardware-validated visual pass before a component replacement is considered.
 - Waybar is the first advanced personalization stage in post-install chapter
-  21; Fuzzel and Mako follow while retaining their current roles.
+  21 and Niri v1 is the second, moved-forward stage in chapter 22. Both are
+  hardware-validated on the first target; Fuzzel follows next.
+- Niri's exact `eDP-1`, 60.049/48.040 Hz, and scale 1.25 policy belongs to
+  the first measured ThinkPad until the second machine is measured.
+- TLP remains the power-policy owner; Niri's event-driven helper only maps the
+  exposed profile to an internal-panel mode and reapplies it after resume.
 - Waybar's selected glyphs make `otf-font-awesome` and
   `ttf-nerd-fonts-symbols-mono` explicit runtime dependencies; they are not
   implicit workstation-local state.
