@@ -10,7 +10,10 @@ Stable first reference edition with active extensions. The core subsystem,
 operation, diagnosis, and recovery guides are published and reviewed, and the
 daily-command reference records the first hardware-validated workstation
 baseline. Further articles are added by topic rather than by repeating the
-installation sequence.
+installation sequence. The modular-desktop guide now also records the
+hardware-validated chapter 23 refinement of Kitty, Mako, Fuzzel, swaylock, and
+the swayidle system-resume path; the accepted static swaybg policy; and the
+hardware-validated chapter 24 tuigreet presentation.
 
 ## Purpose
 

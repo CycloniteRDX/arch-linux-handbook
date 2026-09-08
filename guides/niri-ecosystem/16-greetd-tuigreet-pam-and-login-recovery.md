@@ -60,17 +60,18 @@ The canonical daily-driver path is:
 | Decision | Current value |
 | --- | --- |
 | Login manager | greetd |
-| Greeter | tuigreet on the Linux console |
+| Greeter | Compact themed tuigreet on the Linux console |
 | Greeter VT | VT1 |
 | Greeter system account | `greeter` |
 | Target session | `niri-session` |
-| Automatic login | Disabled |
+| Automatic login | Disabled; every session requires authentication |
+| Remembered state | Last selected session only; username and password are not remembered |
 | Login-keyring integration | Optional GNOME Keyring hooks in the greetd PAM stack |
 | Screen locker | swaylock, using its separate PAM service |
 | Recovery console | TTY3, reached with `Ctrl+Alt+F3` |
 | Seat manager | systemd-logind; no separately enabled `seatd.service` |
 
-The active `/etc/greetd/config.toml` created by the post-install procedure is:
+The safe chapter 11 `/etc/greetd/config.toml` installation baseline is:
 
 ```toml
 [terminal]
@@ -81,6 +82,28 @@ command = "tuigreet --time --remember --remember-session --greeting 'Arch Linux'
 user = "greeter"
 ```
 
+That short command is the safe installation baseline. The later
+hardware-validated daily-driver profile keeps the same ownership and session
+command but uses:
+
+```toml
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --time --time-format '%d/%m/%Y  %H:%M' --remember-session --greeting 'Authorized personnel only' --custom-title 'RogueOS' --width 52 --window-padding 2 --container-padding 2 --prompt-padding 1 --greet-align center --theme 'border=cyan;text=white;time=cyan;container=black;title=magenta;greet=cyan;prompt=magenta;input=white;action=cyan;button=magenta' --background matrix --matrix-length 4,12 --matrix-speed 0.10,0.45 --matrix-colors '#FFFFFF,#5CE1E6,#2A3A50' --cmd niri-session"
+user = "greeter"
+```
+
+The absence of `--remember` is intentional: the username is requested after
+each greeter start. `--remember-session` stores only a successful session
+selection. The absence of `--asterisks` gives no per-keystroke feedback, so
+password length is not exposed. The compact layout, component theme, title,
+greeting, and Matrix animation alter presentation only; greetd and PAM still
+own the security boundary. The validated Matrix values shorten the streams to
+4–12 rows, slow them to 0.10–0.45 rows per frame, and use white, cyan, and dark
+blue bands.
+
 The `user = "greeter"` line identifies the account that draws the login
 interface. It does not mean the desktop runs as `greeter`. After successful
 authentication, greetd starts the selected session under the target account.
@@ -88,6 +111,14 @@ authentication, greetd starts the selected session under the target account.
 The absence of an `[initial_session]` section is equally important. In greetd,
 that optional section is the autologin path. This project deliberately does
 not use it.
+
+The final profile is system configuration rather than a Stow package. Its
+validated rollback chain keeps `/etc/greetd/config.toml.before-niri`,
+`config.toml.pre-tuigreet-customization`, and `config.toml.pre-matrix`. These
+files contain no credentials. Package verification is expected to report
+checksum differences for the locally edited `/etc/greetd/config.toml` and
+`/etc/pam.d/greetd` backup files; that is evidence of the recorded policy, not
+damage to greetd's ordinary packaged files.
 
 ## End-to-end login lifecycle
 
@@ -267,16 +298,23 @@ systemctl --user show-environment | grep -E '^(XDG_SESSION_TYPE|XDG_CURRENT_DESK
 
 ## What tuigreet remembers
 
-The current command uses two persistence options:
+The installation baseline and final profile deliberately differ:
 
-| Option | Stored effect | Not stored |
-| --- | --- | --- |
-| `--remember` | Username from the last successful session | Password |
-| `--remember-session` | Last selected session command | Password or PAM token |
+| Option | Baseline | Final profile | Stored effect |
+| --- | --- | --- | --- |
+| `--remember` | Enabled | Disabled | Username from the last successful session |
+| `--remember-session` | Enabled | Enabled | Last selected session command |
 
 The remembered session can override the `--cmd` default on later runs. If a
 different session was selected manually, seeing something other than Niri on
 the next login may be expected state rather than a broken default.
+
+Disabling `--remember` stops reading, presenting, and updating the remembered
+username, but an older baseline may have already created
+`/var/cache/tuigreet/lastuser` and `lastuser-name`. The final migration removes
+only those two files. It retains `lastsession` and `lastsession-path`, so
+session persistence continues without retaining the account name. No password
+or PAM token is written to this cache.
 
 Current tuigreet uses `/var/cache/tuigreet` for remembered state. The package
 should create it for the greeter account. Inspect it without publishing its
@@ -526,6 +564,12 @@ the user-session theme.
 This project therefore keeps tuigreet as the selected presentation. It does
 not stack another greeter or display manager over greetd, and no greeter
 migration is part of the current roadmap.
+
+The selected presentation is no longer merely a plain fallback: its compact
+RogueOS theme and understated Matrix background passed real login, bad-password,
+logout-return, session-registration, and keyring-unlock validation on the first
+ThinkPad on 2026-09-08. The animation exists only while the greeter is visible;
+it is not a background process inside the authenticated Niri session.
 
 Plymouth is unrelated to this boundary. It can improve the earlier boot and
 encrypted-root presentation, but it ends before the user login manager takes

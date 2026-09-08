@@ -48,16 +48,16 @@ this project rather than a monolithic shell product.
 | --- | --- | --- |
 | Compositor, outputs, workspaces, input | Niri | First-target v1 complete and validated in post-install chapter 22; keep |
 | Bar and compact status | Waybar | First advanced restyle complete and validated in post-install chapter 21; keep |
-| Application launcher | Fuzzel | Restyle and keep until a concrete capability is missing |
-| Notification service | Mako | Restyle and validate before comparing SwayNotificationCenter |
-| Notification history and control panel | Mako tools only | Accept during the first pass; compare SwayNotificationCenter later |
-| Wallpaper renderer | swaybg | Restyle and validate before comparing transition or per-output tools |
+| Application launcher | Fuzzel | Chapter 23 restyle complete and validated; keep until a concrete capability is missing |
+| Notification service | Mako | Chapter 23 restyle complete and validated; compare SwayNotificationCenter only later |
+| Notification history and control panel | Mako tools only | Twenty-item history and Fuzzel action picker validated in chapter 23; compare SwayNotificationCenter later |
+| Wallpaper renderer | swaybg | Static wallpaper and fallback colour accepted; no rotation or automation scripts |
 | Qt 6 appearance | qt6ct with Fusion | Keep as the sole Qt 6 widget-theme owner; evaluate exceptions per application |
-| Screen locker | swaylock | Restyle and validate before comparing hyprlock or gtklock |
-| Idle and pre-sleep coordination | swayidle | Keep as sole owner; call the reviewed battery-aware helper at 30 minutes |
+| Screen locker | swaylock | Chapter 23 restyle complete and validated; compare hyprlock or gtklock only for a concrete gap |
+| Idle and pre-sleep coordination | swayidle | Keep as sole owner; call the reviewed battery-aware helper at 30 minutes and restore monitors after resume |
 | Custom dashboard and widgets | None | Defer Eww until the existing desktop completes its visual pass |
 | Login manager | greetd | Keep |
-| Login presentation | tuigreet | Restyle near the end of the first pass while preserving TTY recovery |
+| Login presentation | tuigreet | Compact chapter 24 profile validated while preserving greetd, PAM, and TTY recovery |
 | Early-boot presentation | Plymouth | Restyle last, after the session and login language are stable |
 | Hardware power policy | TLP plus `tlp-pd` | Keep; no shell may introduce a second provider |
 
@@ -863,21 +863,29 @@ Use separate post-install chapters and dotfiles checkpoints in this order:
 2. finish Niri's first-target input, window, overview, motion, output, and
    adaptive-refresh policy — moved forward, complete, and hardware-validated
    in chapter 22;
-3. refine Fuzzel without replacing the application launcher — next;
-4. refine Mako while it remains the sole notification daemon;
-5. refine swaylock without changing PAM or any lock path;
-6. refine swaybg and wallpaper presentation while retaining one renderer;
-7. reconcile Kitty, GTK, and Qt details after every shell surface has a stable
-   visual language;
-8. restyle tuigreet while preserving greetd, PAM, and TTY3 recovery;
-9. restyle Plymouth last while preserving the textual fallback UKI;
-10. validate the complete sequence and publish one stable dotfiles release.
+3. refine Kitty, Mako, Fuzzel, and swaylock while preserving their established
+   roles, and add explicit system-resume monitor restoration — complete and
+   hardware-validated together in chapter 23;
+4. retain swaybg with one static wallpaper and fallback colour, without
+   rotation or automation scripts — accepted and hardware-validated;
+5. restyle tuigreet while preserving greetd, PAM, and TTY3 recovery — complete
+   and hardware-validated in chapter 24;
+6. reconcile GTK and Qt details across representative applications — next;
+7. personalize Micro, Nano, and Vim as separate terminal-editor surfaces;
+8. restyle Plymouth last while preserving the textual fallback UKI;
+9. validate the complete sequence and publish one stable dotfiles release.
 
-Chapters 21 and 22 implement the first two items. Niri moved forward because
-its input and refresh behavior was refined alongside Waybar, but the
-checkpoints remain separate: chapter 21 is the last Waybar-only commit and
-chapter 22 is the cumulative finished session. Each later stage changes one
-surface, proves rollback, and leaves every other owner in place.
+Chapters 21 through 24 implement the tracked system and desktop refinements.
+Niri moved forward because its input and refresh behavior was refined alongside
+Waybar, but the
+first two checkpoints remain separate: chapter 21 is the last Waybar-only
+commit and chapter 22 is the cumulative finished Niri session. Chapter 23
+records the already-committed five-change component series as one cumulative
+checkpoint; each commit still isolates one component or lifecycle adjustment,
+and the complete set passed hardware validation on 2026-09-08. The existing
+swaybg policy was then accepted without adding a script or daemon. Chapter 24
+records tuigreet as a system-only refinement, so it advances the post-install
+checkpoint without requiring a matching dotfiles change.
 
 ### Phase 3 — validate the complete existing stack
 
@@ -1039,8 +1047,11 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
 - Every existing surface, including tuigreet and Plymouth, completes one
   hardware-validated visual pass before a component replacement is considered.
 - Waybar is the first advanced personalization stage in post-install chapter
-  21 and Niri v1 is the second, moved-forward stage in chapter 22. Both are
-  hardware-validated on the first target; Fuzzel follows next.
+  21 and Niri v1 is the second, moved-forward stage in chapter 22. Kitty,
+  Mako, Fuzzel, swaylock, and explicit system-resume monitor restoration form
+  the hardware-validated chapter 23 checkpoint. The existing static swaybg
+  policy is accepted without automation, and the compact themed tuigreet
+  profile is the hardware-validated system-only chapter 24 checkpoint.
 - Niri's exact `eDP-1`, 60.049/48.040 Hz, and scale 1.25 policy belongs to
   the first measured ThinkPad until the second machine is measured.
 - TLP remains the power-policy owner; Niri's event-driven helper only maps the
@@ -1052,15 +1063,19 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   transactional, independently validated experiment.
 - Eww remains a later bounded-dashboard candidate; it does not replace the
   notification daemon, locker, idle coordinator, or system services.
-- swaylock is styled before hyprlock or gtklock is compared.
+- swaylock's chapter 23 style is validated before hyprlock or gtklock is
+  compared.
 - swayidle remains the first coordinator for lock, monitor power, pre-sleep,
-  and the new automatic-suspend stage.
+  post-resume monitor restoration, and the automatic-suspend stage.
 - The initial automatic-suspend policy is 30 minutes on battery only, after
   lock at 5 minutes and display-off at 10 minutes; AC suspend remains manual or
   lid-driven initially.
 - Post-logout automatic suspend is a separate greeter/logind project because
   user-session timers end at logout.
-- greetd remains the login manager and tuigreet remains the selected frontend.
+- greetd remains the login manager and the styled tuigreet profile remains the
+  selected frontend; it remembers the selected session but not the username.
+- GTK/Qt consistency is the next open presentation review, followed by
+  separate Micro, Nano, and Vim personalization.
 - Plymouth is restyled only after session and login presentation are stable;
   the independent textual fallback UKI remains outside the theme.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
