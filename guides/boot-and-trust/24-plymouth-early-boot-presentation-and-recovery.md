@@ -365,12 +365,13 @@ plymouth-set-default-theme -l
 find /usr/share/plymouth/themes -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort
 ```
 
-The project baseline is the packaged `bgrt` theme:
+The project's initial baseline was the packaged `bgrt` theme:
 
 - it can reuse the firmware-provided OEM logo where BGRT is available;
 - it adds a spinner and password-entry presentation;
 - it introduces no AUR theme or external installer;
-- it provides a neutral foundation before guide 26 chooses final branding.
+- it provided a neutral foundation before post-install chapter 26 selected the
+  final minimal RogueOS presentation.
 
 If BGRT is unavailable or renders poorly, the packaged `spinner` theme is the
 first fallback. The project does not install `breeze-plymouth` merely because
@@ -389,6 +390,34 @@ initramfs. Review:
 
 Never adopt a theme after testing only its spinner. Encrypted-root input is its
 most important function.
+
+### Validated RogueOS refinement
+
+Post-install chapter 26 replaces the initial BGRT baseline with one
+project-owned `two-step` descriptor. It deliberately reuses the complete
+package-owned Spinner asset directory, including Arch's `watermark.png`, the
+lock and protected-entry controls, and animation frames. The repository does
+not copy those assets or edit the package-owned `bgrt` and `spinner` themes.
+
+The theme removes `UseFirmwareBackground=true`, uses a solid Midnight Circuit
+background (`0x0b0f17`), places the Arch watermark above the encrypted-root
+dialog, and retains the standard input behavior. This does not replace the
+firmware phase: seeing Lenovo first and the Arch watermark only after the
+kernel starts is the intended ownership handoff.
+
+Only the descriptor is installed below
+`/usr/share/plymouth/themes/rogueos/`. Earlier custom PNG and script
+experiments are archived outside the theme search path so they cannot appear
+as duplicate theme definitions. The source belongs in
+`arch-linux-post-install/assets/plymouth/rogueos/rogueos.plymouth`, not in the
+user dotfiles repository.
+
+The hardware test on 2026-09-09 verified the normal UKI's Arch watermark,
+protected TPM PIN input, reset after one rejected PIN, successful retry, and
+clean tuigreet handoff. No spinner was perceptible because `two-step` replaces
+ordinary animation with the password dialog while a request is active and the
+post-unlock path completes quickly. Delaying boot merely to expose an
+animation is explicitly rejected.
 
 ### Theme selection and rebuild are distinct
 
@@ -428,10 +457,10 @@ For example, mkinitcpio supports a normal-only preset source such as:
 default_splash="/path/to/reviewed-image.bmp"
 ```
 
-The chapter 19 Plymouth implementation does not add this. Firmware BGRT plus the
-packaged theme already tests enough new boundaries. A custom UKI bitmap can be
-considered with the final visual language in guide 26, and should remain absent
-from the textual fallback UKI.
+The chapter 19 Plymouth implementation and chapter 26 visual refinement do not
+add this. The selected Plymouth theme already owns the required visual phase;
+a second static UKI bitmap would add another asset and handoff without helping
+encrypted-root input. It remains absent from both normal and fallback UKIs.
 
 ## Staged implementation model
 
@@ -891,6 +920,8 @@ The recorded design is:
 - Plymouth is the selected graphical early-boot layer in post-install chapter 19;
 - the handbook explains it while the post-install chapter owns the changes;
 - the official Arch package and built-in `bgrt` theme form the first baseline;
+- post-install chapter 26 advances that baseline to the minimal project-owned
+  RogueOS descriptor while reusing Arch's packaged Spinner assets;
 - no AUR theme, KDE control module, alternate initramfs generator, artificial
   animation delay, or broad silent-boot parameter bundle is introduced;
 - the normal UKI includes Plymouth and embeds `quiet splash` after chapter 19;
@@ -901,12 +932,14 @@ The recorded design is:
 - systemd remains before Plymouth and Plymouth remains before `sd-encrypt`;
 - the US keymap, wrong-passphrase retry, `Esc`, internal panel, dock, and
   external display all require physical tests;
-- a UKI `.splash` bitmap is separate and deferred to final visual polish;
+- a UKI `.splash` bitmap remains separate and is not added;
 - all rebuilds must complete for both presets and pass sbctl verification;
 - theme/package removal must follow source restoration and a verified rebuild;
 - Plymouth is stabilized before post-install chapter 20 applies guide 25's
   TPM2-bound LUKS unlock design;
-- the strong LUKS passphrase and textual fallback remain recovery credentials.
+- the strong LUKS passphrase and textual fallback remain recovery credentials;
+- the textual fallback remains independent of Plymouth even when current
+  systemd auto-discovers the enrolled TPM2 token from LUKS2 metadata.
 
 ## Sources and further reading
 
@@ -921,6 +954,8 @@ The recorded design is:
 - [`ukify(1)`](https://man.archlinux.org/man/ukify.1.en)
 - [`systemd-stub(7)`](https://man.archlinux.org/man/systemd-stub.7.en)
 - [`kernel-command-line(7)`](https://man.archlinux.org/man/kernel-command-line.7.en)
+- [`crypttab(5)`](https://man.archlinux.org/man/crypttab.5.en)
+- [systemd automatic LUKS2 token discovery](https://github.com/systemd/systemd/issues/36293)
 
 Continue with guide 25 for the TPM2-bound LUKS design, then use post-install
 chapter 20 for its ordered, hardware-validated implementation and checkpoints.

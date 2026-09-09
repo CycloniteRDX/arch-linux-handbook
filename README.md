@@ -16,7 +16,10 @@ the swayidle system-resume path; the accepted static swaybg policy; and the
 hardware-validated chapter 24 tuigreet presentation. The shell and editor
 foundation now also records chapter 25's validated Bash, Nano, Micro, and Vim
 packages, while the workstation guide distinguishes BlueZ service state from
-the selected adapter-off-at-boot policy.
+the selected adapter-off-at-boot policy. The boot guide now records chapter
+26's hardware-validated RogueOS Plymouth presentation, its reuse of packaged
+Arch assets, and the current systemd TPM2-token discovery behavior observed in
+the textual fallback.
 
 ## Purpose
 

@@ -58,7 +58,7 @@ this project rather than a monolithic shell product.
 | Custom dashboard and widgets | None | Defer Eww until the existing desktop completes its visual pass |
 | Login manager | greetd | Keep |
 | Login presentation | tuigreet | Compact chapter 24 profile validated while preserving greetd, PAM, and TTY recovery |
-| Early-boot presentation | Plymouth | Restyle last, after the session and login language are stable |
+| Early-boot presentation | Plymouth | Minimal RogueOS theme validated in post-install chapter 26; retain the Plymouth-free fallback |
 | Hardware power policy | TLP plus `tlp-pd` | Keep; no shell may introduce a second provider |
 
 The table is a dependency contract, not merely a list of preferred programs.
@@ -872,9 +872,9 @@ Use separate post-install chapters and dotfiles checkpoints in this order:
    and hardware-validated in chapter 24;
 6. personalize Bash, Nano, Micro, and Vim as separate packages — complete and
    hardware-validated in chapter 25;
-7. reconcile GTK and Qt details across representative applications — next;
-8. decide whether to restyle Plymouth while preserving the textual fallback
-   UKI;
+7. install the minimal RogueOS Plymouth theme while preserving the textual
+   fallback UKI — complete and hardware-validated in chapter 26;
+8. reconcile GTK and Qt details across representative applications — next;
 9. validate the complete sequence and publish one stable dotfiles release.
 
 Chapters 21 through 24 implement the tracked system and desktop refinements.
@@ -1076,12 +1076,12 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   user-session timers end at logout.
 - greetd remains the login manager and the styled tuigreet profile remains the
   selected frontend; it remembers the selected session but not the username.
-- GTK/Qt consistency is the next open presentation review, followed by the
-  optional Plymouth decision. The separate Bash, Nano, Micro, and Vim packages
-  are complete and hardware-validated in chapter 25.
-- Plymouth is restyled only if the existing session and login presentation is
-  stable and a concrete improvement is selected;
-  the independent textual fallback UKI remains outside the theme.
+- The separate Bash, Nano, Micro, and Vim packages are complete and
+  hardware-validated in chapter 25. Plymouth's minimal RogueOS theme is
+  complete and hardware-validated in chapter 26. GTK/Qt consistency is the
+  next open presentation review.
+- Plymouth reuses Arch's packaged watermark and encrypted-root controls; the
+  independent textual fallback UKI remains outside the theme.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
 - qt6ct plus Fusion is the sole Qt 6 widget-appearance path; Niri exports only
   `QT_QPA_PLATFORMTHEME=qt6ct`, while Qt retains automatic platform selection.

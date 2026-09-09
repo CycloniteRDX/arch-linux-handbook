@@ -47,8 +47,8 @@ only when its first reviewed article is ready.
 - [Plymouth, early-boot presentation, and recovery](boot-and-trust/24-plymouth-early-boot-presentation-and-recovery.md)
   explains firmware-to-greeter visual handoffs, Plymouth architecture,
   graphical LUKS requests, KMS and SimpleDRM, quiet versus splash, distinct
-  graphical and textual UKIs, themes, signing, testing, diagnosis, and
-  recovery.
+  graphical and textual UKIs, the validated minimal RogueOS theme, packaged
+  asset reuse, signing, testing, diagnosis, and recovery.
 - [TPM2-bound LUKS unlock, measured-boot policy, and recovery](boot-and-trust/25-tpm2-bound-luks-unlock-measured-boot-and-recovery.md)
   separates Secure Boot, measured boot, TPM sealing, LUKS, and login; it
   explains PCRs, signed PCR 11 policy, PCR 7, PIN and fallback credentials,
@@ -160,7 +160,7 @@ recoverable.
 | 21 | Published | Shell and terminal fundamentals, redirection, editors, paths, and the documentation workflow. |
 | 22 | Published | Git and GitHub, SSH authentication, repository setup, daily workflow, Conventional Commits, and recovery. |
 | 23 | Published | Printing and peripheral integration, discovery, authorization, drivers, and diagnosis. |
-| 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, UKI integration, and recovery. |
+| 24 | Published | Plymouth, early-boot presentation, encrypted-root prompts, the validated RogueOS theme, UKI integration, and recovery. |
 | 25 | Published | TPM2-bound LUKS unlock, measured-boot policy, fallback credentials, and recovery. |
 | 26 | Published | Themes, icons, cursors, wallpapers, Qt 6 appearance, modular desktop polish, the stable tuigreet boundary, and automatic suspend. |
 | 27 | Published | Daily and occasional command reference for operating and maintaining the validated workstation. |

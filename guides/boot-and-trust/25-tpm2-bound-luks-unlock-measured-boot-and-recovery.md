@@ -24,8 +24,9 @@ This guide explains:
 - signed PCR 11 policies and their relationship to UKI `.pcrsig` and
   `.pcrpkey` sections;
 - the project policy of PCR 7 plus signed PCR 11, with a TPM PIN;
-- why the normal UKI may request the TPM while the textual fallback UKI must
-  continue to require a strong LUKS credential;
+- why the normal UKI explicitly requests the TPM while current systemd may
+  also discover the enrolled token from the textual fallback, and why strong
+  manual LUKS credentials must remain available;
 - separate Secure Boot and PCR-policy signing keys;
 - update, firmware, key-rotation, testing, rollback, and ISO recovery paths;
 - where `systemd-pcrlock` fits and why it is not the first implementation.
@@ -328,8 +329,10 @@ Post-install chapter 20 uses all of these conditions:
    works without the TPM.
 5. **A generated recovery key.** It is stored offline and tested before TPM
    enrollment.
-6. **TPM requested only by the normal UKI.** The fallback UKI deliberately
-   omits `tpm2-device=auto` and therefore requests the strong LUKS credential.
+6. **TPM explicitly requested only by the normal UKI.** The fallback UKI
+   deliberately omits `tpm2-device=auto`; current systemd may nevertheless
+   discover the enrolled token from LUKS2 metadata, so manual credentials
+   remain the independent recovery layer.
 7. **Separate per-ThinkPad policy keys.** No private PCR key or TPM enrollment
    is copied through Git or reused blindly on the second machine.
 
@@ -412,19 +415,22 @@ The comma is significant: `discard` and `tpm2-device=auto` are two options for
 the same per-device `rd.luks.options=` value. Do not create competing duplicate
 entries for the same UUID.
 
-The fallback does not disable the TPM or delete its LUKS token. It simply does
-not tell early `systemd-cryptsetup` to use a TPM device. It therefore tests the
-independent password-agent, keyboard, LUKS passphrase, broader initramfs,
-storage, and root path.
+The fallback does not disable the TPM or delete its LUKS token. It omits the
+explicit `tpm2-device=auto` request, but current systemd-cryptsetup can discover
+a suitable enrolled token directly from LUKS2 metadata. It may therefore
+present a textual TPM PIN prompt. Its independent properties are the textual
+password-agent, broader initramfs, storage/root path, and absence of Plymouth;
+the separately tested passphrase and recovery key remain manual credentials.
 
 If TPM evaluation fails on the normal UKI, systemd can fall back to its
 password-agent logic. The separate fallback UKI is still valuable because it
-also excludes the TPM request, quiet presentation, and Plymouth dependency.
+excludes the explicit TPM command-line option, quiet presentation, and
+Plymouth dependency.
 
 The fallback UKI may still contain `.pcrsig` and `.pcrpkey`, because the common
-ukify configuration signs both builds. Those passive sections do not trigger
-TPM unlock by themselves. The command-line option controls whether the token
-path is attempted.
+ukify configuration signs both builds. Those passive sections do not
+themselves contain the sealed secret. Token metadata in the LUKS2 header may
+still cause the token path to be attempted.
 
 ## Threat model and remaining boundaries
 
@@ -845,8 +851,10 @@ numbers, policy hashes, and platform details.
 Reboot, select the fallback UKI, and verify:
 
 1. early boot remains textual;
-2. the prompt requests a LUKS credential, not the TPM PIN;
-3. the strong passphrase opens `cryptlvm`;
+2. a discovered TPM2 token or a strong manual LUKS credential opens
+   `cryptlvm`;
+3. the strong passphrase is separately proven with
+   `cryptsetup --test-passphrase`;
 4. the fallback command line contains no `tpm2-device=auto`, `quiet`, or
    `splash`;
 5. the broader initramfs reaches the installed system;
@@ -856,8 +864,8 @@ The generated recovery key should also receive a scheduled controlled boot
 test, entered through this independent textual path. Do not perform that test
 in public or while screen recording.
 
-Failure of the fallback password route is a release blocker even when normal
-TPM unlock works.
+Failure of both fallback boot and the independently tested manual credential
+is a release blocker even when normal TPM unlock works.
 
 ## Update lifecycle
 
@@ -954,7 +962,7 @@ path failed.
 | TPM PIN prompt never appears on normal UKI | Normal command line or token discovery | Enter passphrase; inspect `rd.luks.options` and token |
 | PIN accepted but policy fails | PCR 7/11, public key, signature, or TPM state | Enter passphrase; inspect current boot before reenrolling |
 | Prompt asks for full LUKS passphrase | Token attempt was skipped or failed and password fallback began | Use the known credential; this is recovery, not corruption |
-| Normal fails, fallback accepts passphrase | TPM, signed-PCR, Plymouth, or normal-only command line | Remain on trusted fallback and compare artifacts |
+| Normal fails, fallback unlocks | Plymouth, host-pruned initramfs, quiet presentation, or a normal-only input | Remain on trusted fallback and compare artifacts; note whether its token was auto-discovered |
 | Both UKIs reject a known passphrase | Keyboard, wrong container, damaged/changed header, or credential issue | Stop retries and use ISO/read-only inspection |
 | TPM works until a kernel update | New `.pcrsig` missing/invalid or wrong policy key | Passphrase boot; inspect ukify config and rebuild |
 | TPM works until Secure Boot update | Raw PCR 7 changed | Verify intended trust-policy change, then reenroll |
@@ -1188,7 +1196,8 @@ The recorded design is:
   UKIs as before;
 - both UKIs may carry PCR-policy sections, but only the normal command line
   requests `tpm2-device=auto`;
-- the fallback UKI stays textual and requires the strong LUKS credential;
+- the fallback UKI stays textual; current systemd may auto-discover the TPM2
+  token, while the separately tested strong credential remains available;
 - normal `rd.luks.options=` combines `discard,tpm2-device=auto` for the same
   real UUID; fallback retains only `discard`;
 - no password or recovery slot is ever wiped because TPM unlock works;
@@ -1224,9 +1233,12 @@ failures.
 ### The textual fallback is a credential test, not just a driver bundle
 
 Before guide 24, fallback primarily meant broad modules. After guides 24 and
-25 it also proves that graphical presentation, TPM discovery, PCR evaluation,
-and the PIN are not required to unlock the disk. That makes its scheduled boot
-test a direct recovery rehearsal.
+25 it proves that graphical presentation is not required and that the broader
+textual image reaches the same storage stack. Because current systemd may
+auto-discover the enrolled TPM2 token, fallback boot alone does not prove that
+the token was bypassed. A separate `cryptsetup --test-passphrase` check proves
+the manual credential without changing mappings; together the two tests form
+the recovery rehearsal.
 
 ### Two ThinkPads need the same policy shape, not the same secrets
 
@@ -1252,6 +1264,7 @@ disappears.
 - [`systemd-cryptsetup(8)`](https://man.archlinux.org/man/systemd-cryptsetup.8)
 - [`systemd-cryptsetup-generator(8)`](https://man.archlinux.org/man/systemd-cryptsetup-generator.8)
 - [`crypttab(5)`](https://man.archlinux.org/man/crypttab.5)
+- [systemd automatic LUKS2 token discovery](https://github.com/systemd/systemd/issues/36293)
 - [`systemd-stub(7)`](https://man.archlinux.org/man/systemd-stub.7)
 - [`systemd-measure(1)`](https://man.archlinux.org/man/systemd-measure.1)
 - [`ukify(1)`](https://man.archlinux.org/man/ukify.1)
