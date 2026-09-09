@@ -245,6 +245,39 @@ restart. Distribution defaults or BlueZ policy may power it automatically
 when the service starts. Diagnose the effective behavior rather than adding a
 custom `main.conf` option pre-emptively.
 
+The validated RogueOS policy deliberately changes that default after manual
+Bluetooth operation has been proved. `/etc/bluetooth/main.conf` keeps its
+existing `[Policy]` section and sets:
+
+```ini
+AutoEnable=false
+```
+
+BlueZ defines this option as the policy for enabling controllers when they are
+found, including adapters present at startup and adapters connected later. It
+does not control whether `bluetooth.service` is enabled. On the validated
+ThinkPad, `bluetoothd`, `blueman-applet`, and `blueman-tray` still start, while
+the radio starts unavailable behind its Bluetooth soft block. Enabling it in
+Blueman exposes `hci0`, clears the block, and produces `Powered: yes`; disabling
+it again leaves the controller at `Powered: no` and `PowerState: off`.
+
+This is an enabled-daemon, radio-off policy—not a disabled-service policy. It
+keeps pairing, audio, Waybar, and graphical control immediately available while
+avoiding an automatically powered radio. Preserve the original file before
+editing, test after a cold boot, and inspect both layers:
+
+```bash
+systemctl is-enabled bluetooth.service
+systemctl is-active bluetooth.service
+rfkill list bluetooth
+bluetoothctl show
+```
+
+Before the first manual enable, `bluetoothctl show` may report no default
+controller on this platform. That observation is compatible with a healthy,
+active BlueZ service. After enabling Bluetooth in Blueman, it must report the
+identified controller with `Powered: yes`; after disabling it, `Powered: no`.
+
 ### Pairing, bonding, trusting, and connecting
 
 These words describe different state:
@@ -1034,10 +1067,17 @@ failed system unit should be hidden to make the checklist pass.
 ### 3. Verify Bluetooth state
 
 ```bash
+systemctl is-enabled bluetooth.service
+systemctl is-active bluetooth.service
 rfkill list bluetooth
 bluetoothctl show
 bluetoothctl devices
 ```
+
+For the selected startup policy, first run these checks after a cold boot and
+before clicking Blueman. Then enable the adapter manually, repeat them, and
+disable it again. This proves service availability, startup radio state, and
+the manual control path separately.
 
 For each deliberately paired device:
 
@@ -1392,6 +1432,10 @@ case.
 ## Completion checklist
 
 - [ ] BlueZ is the only enabled Bluetooth system daemon.
+- [ ] `AutoEnable=false` keeps the controller off at boot without disabling
+      BlueZ, Blueman, or Wi-Fi.
+- [ ] Blueman can power the controller on and off without changing the system
+      service state.
 - [ ] rfkill, BlueZ power, discovery, pairing, trust, and connection are
       understood as separate states.
 - [ ] Only identified devices are bonded and trusted.
@@ -1427,6 +1471,7 @@ case.
 - [BlueZ `bluetoothctl(1)`](https://man.archlinux.org/man/bluetoothctl.1)
 - [BlueZ Adapter D-Bus API](https://man.archlinux.org/man/org.bluez.Adapter.5)
 - [BlueZ Device D-Bus API](https://man.archlinux.org/man/org.bluez.Device.5)
+- [BlueZ reference `main.conf`](https://github.com/bluez/bluez/blob/master/src/main.conf)
 - [Arch `blueman` package contents](https://archlinux.org/packages/extra/x86_64/blueman/files/)
 - [ArchWiki: Bluetooth](https://wiki.archlinux.org/title/Bluetooth)
 - [ArchWiki: Bluetooth headset](https://wiki.archlinux.org/title/Bluetooth_headset)

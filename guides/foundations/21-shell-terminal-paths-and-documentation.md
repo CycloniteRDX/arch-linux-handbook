@@ -27,11 +27,12 @@ commands in the runbook, post-install guide, and handbook. It explains:
 - why commands written for Bash cannot be pasted unchanged into Windows
   PowerShell.
 
-It does not replace a Bash programming book, design a custom prompt, add shell
-aliases or plugins, switch the login shell, install another terminal, create a
-Bash Stow package, or teach Git. Guide 22 covers Git and GitHub. Guides 01, 02,
-03, and 04 remain authoritative for configuration precedence, permissions,
-systemd, and package management.
+It does not replace a Bash programming book, switch the login shell, install
+another terminal, add a shell or editor plugin framework, or teach Git. It now
+records the bounded Bash, Nano, Micro, and Vim choices validated in post-install
+chapter 25. Guide 22 covers Git and GitHub. Guides 01, 02, 03, and 04 remain
+authoritative for configuration precedence, permissions, systemd, and package
+management.
 
 ## Current project contract
 
@@ -55,18 +56,21 @@ output. Bash is normally that child program and interprets the command
 language. Opening a different terminal emulator would not turn Bash syntax
 into another language; changing the shell would not replace Kitty's window.
 
-The project currently has a portable Kitty package, but no Bash, Micro, or Vim
-dotfile package. Bash remains deliberately close to the Arch default:
+The project now has separate portable Kitty, Bash, Nano, Micro, and Vim Stow
+packages. Bash remains deliberately close to the Arch model:
 
 - no `chsh` operation;
-- no aliases that replace `cat`, `grep`, `find`, `ls`, or other standard tools;
-- no prompt framework;
+- no alias that replaces `cat`, `find`, `rm`, `cp`, or another destructive or
+  structurally important tool;
+- a small set of transparent `ls` and color aliases;
+- a project-owned two-line prompt rather than a prompt framework;
 - no Fish, Zsh, or Nushell migration;
 - no automatic `fzf` keybindings or completion;
 - no unreviewed shell code sourced from the network.
 
-This guide explains the stable foundation before those optional choices are
-evaluated.
+Nano, Micro, and Vim also remain plugin-free. Their tracked configurations own
+editing behavior, project colors, and KDL/Kitty syntax where required; package
+installation and generated state remain outside the dotfiles repository.
 
 ## The layers behind one prompt
 
@@ -1078,9 +1082,12 @@ The essential default keys are:
 | `Ctrl+G` | Open Micro's in-editor help |
 
 Micro's configuration resolves through `MICRO_CONFIG_HOME`, then
-`XDG_CONFIG_HOME/micro`, then `~/.config/micro`. The project has not created a
-Micro configuration package yet; do not assume plugin, colorscheme, or
-keybinding changes are portable between the two ThinkPads.
+`XDG_CONFIG_HOME/micro`, then `~/.config/micro`. The reviewed `micro` Stow
+package now supplies `settings.json`, the RogueOS colorscheme, and local KDL
+and Kitty syntax definitions. It selects true color, external Wayland
+clipboard integration, four-space indentation, visual wrapping, persistent
+undo/cursor state, and useful search, diff, and whitespace indicators without
+installing plugins.
 
 ### Prefer `sudoedit` over running the editor as root
 
@@ -1112,13 +1119,15 @@ Guide 01 explains drop-ins and precedence. Guide 02 explains `visudo`, PAM,
 permissions, and privilege boundaries. Guide 03 explains service reload and
 restart semantics.
 
-### Vim is a recovery literacy skill, not the current editor choice
+### Vim is a configured learning and recovery tool
 
-The project installs Vim without plugins or user configuration, but it does
-not select Vim as the canonical editor. Micro remains the convenient default
-for terminal editing. A recovery environment, remote host, or dedicated
-command such as `visudo` may still present a vi-like editor. The smallest
-survival model is:
+The project does not select Vim as the canonical editor: Micro remains the
+convenient default for terminal editing. Vim now has a small, plugin-free Stow
+package so modal editing can be learned with predictable line numbers,
+indentation, searching, wrapping, splits, status information, persistent undo,
+isolated swap state, RogueOS colors, and Wayland clipboard access. A recovery
+environment, remote host, or dedicated command such as `visudo` may still
+present a different vi-like editor. The smallest survival model is:
 
 | Input | Meaning in a vi-compatible editor |
 | --- | --- |
@@ -1130,8 +1139,9 @@ survival model is:
 | `:q!` then Enter | Quit and discard unsaved editor-buffer changes |
 
 These commands do not apply to Micro. Check the editor actually on screen
-before using them. A future editor-comparison guide or dotfile decision may go
-deeper; the installed Vim remains an uncustomized secondary and recovery tool.
+before using them. The installed Vim remains a deliberately conservative
+secondary and recovery tool; its configuration does not imply that another
+machine or an installation ISO has the same options or clipboard provider.
 
 ### Editor-selection variables
 
@@ -1169,6 +1179,14 @@ default `/etc/profile`/skeleton files connect the system and user startup
 paths. The installed `bash-completion` framework is sourced through Arch's
 system Bash configuration; it does not require copying a large completion
 block into the user's `.bashrc`.
+
+The chapter 25 Bash package uses `.bash_profile` only to source `.bashrc` when
+present. `.bashrc` immediately returns from non-interactive shells, then owns
+bounded append-only history, Readline preferences, four transparent aliases,
+Git prompt state, previous-command status, and the RogueOS prompt. Its
+`PROMPT_COMMAND` integration prepends one status-capture function while
+preserving existing hooks such as Kitty shell integration. It does not start a
+desktop process, export secrets, or replace Arch's completion framework.
 
 Inspect actual files and invocation instead of guessing:
 
@@ -1539,17 +1557,17 @@ only good choice.
 | Vim/Neovim | Powerful modal editing and extensibility | Learning curve, plugin/config lifecycle, recovery simplicity |
 | ShellCheck | Static shell analysis | Package and CI policy; does not prove runtime safety |
 
-Any later Bash package should be small, reviewable, Stow-managed, and separate
-portable policy from host secrets and generated history. It should first
-define startup-file ownership, prompt behavior, editor variables, completion,
-history privacy, `fzf` integration, aliases, script linting, and rollback.
+Any later expansion of the Bash package should remain small, reviewable, and
+Stow-managed, separating portable policy from host secrets and generated
+history. Prompt frameworks, `fzf` integration, more aliases, editor variables,
+or shell linting must each justify their additional ownership and maintenance.
 
 ## Decisions recorded for this project
 
 - Kitty remains the terminal emulator and Bash remains the login and
   interactive shell.
-- Micro remains the canonical terminal editor; Vim remains installed without
-  user configuration as a secondary learning and recovery tool.
+- Micro remains the canonical terminal editor; Nano is the simple fallback;
+  Vim has a plugin-free secondary learning and recovery configuration.
 - PowerShell is used for Windows repository handoffs, and package Git commands
   remain on one line where practical.
 - Bash and PowerShell code fences are never assumed interchangeable.
@@ -1567,8 +1585,8 @@ history privacy, `fzf` integration, aliases, script linting, and rollback.
 - `sudoedit` is preferred for ordinary privileged text editing; specialized
   validators such as `visudo` retain ownership of their formats.
 - `.bashrc` does not own graphical-session autostart or systemd user services.
-- No aliases, prompt framework, shell plugins, editor plugins, or Bash dotfiles
-  are added by this guide.
+- The tracked Bash prompt and small aliases do not add a prompt framework,
+  shell plugins, editor plugins, or graphical-session autostart.
 - Local documentation matching the installed version is checked before
   generic web examples.
 - The offline ArchWiki copy is recovery material and a dated reference, not an

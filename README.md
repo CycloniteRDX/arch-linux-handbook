@@ -13,7 +13,10 @@ baseline. Further articles are added by topic rather than by repeating the
 installation sequence. The modular-desktop guide now also records the
 hardware-validated chapter 23 refinement of Kitty, Mako, Fuzzel, swaylock, and
 the swayidle system-resume path; the accepted static swaybg policy; and the
-hardware-validated chapter 24 tuigreet presentation.
+hardware-validated chapter 24 tuigreet presentation. The shell and editor
+foundation now also records chapter 25's validated Bash, Nano, Micro, and Vim
+packages, while the workstation guide distinguishes BlueZ service state from
+the selected adapter-off-at-boot policy.
 
 ## Purpose
 

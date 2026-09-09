@@ -24,8 +24,8 @@ only when its first reviewed article is ready.
   documentation](foundations/21-shell-terminal-paths-and-documentation.md)
   distinguishes terminal and shell layers and explains Bash parsing, paths,
   quoting, environments, standard streams, exit statuses, jobs, safe file
-  operations, Micro, startup files, PowerShell boundaries, and how to read
-  local and online documentation.
+  operations, the validated Bash/Nano/Micro/Vim packages, startup files,
+  PowerShell boundaries, and how to read local and online documentation.
 
 ### Git and GitHub
 

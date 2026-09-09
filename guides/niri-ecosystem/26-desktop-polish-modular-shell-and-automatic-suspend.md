@@ -870,9 +870,11 @@ Use separate post-install chapters and dotfiles checkpoints in this order:
    rotation or automation scripts — accepted and hardware-validated;
 5. restyle tuigreet while preserving greetd, PAM, and TTY3 recovery — complete
    and hardware-validated in chapter 24;
-6. reconcile GTK and Qt details across representative applications — next;
-7. personalize Micro, Nano, and Vim as separate terminal-editor surfaces;
-8. restyle Plymouth last while preserving the textual fallback UKI;
+6. personalize Bash, Nano, Micro, and Vim as separate packages — complete and
+   hardware-validated in chapter 25;
+7. reconcile GTK and Qt details across representative applications — next;
+8. decide whether to restyle Plymouth while preserving the textual fallback
+   UKI;
 9. validate the complete sequence and publish one stable dotfiles release.
 
 Chapters 21 through 24 implement the tracked system and desktop refinements.
@@ -1074,9 +1076,11 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   user-session timers end at logout.
 - greetd remains the login manager and the styled tuigreet profile remains the
   selected frontend; it remembers the selected session but not the username.
-- GTK/Qt consistency is the next open presentation review, followed by
-  separate Micro, Nano, and Vim personalization.
-- Plymouth is restyled only after session and login presentation are stable;
+- GTK/Qt consistency is the next open presentation review, followed by the
+  optional Plymouth decision. The separate Bash, Nano, Micro, and Vim packages
+  are complete and hardware-validated in chapter 25.
+- Plymouth is restyled only if the existing session and login presentation is
+  stable and a concrete improvement is selected;
   the independent textual fallback UKI remains outside the theme.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.
 - qt6ct plus Fusion is the sole Qt 6 widget-appearance path; Niri exports only
