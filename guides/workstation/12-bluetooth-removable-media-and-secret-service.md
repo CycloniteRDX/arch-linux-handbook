@@ -255,16 +255,17 @@ AutoEnable=false
 
 BlueZ defines this option as the policy for enabling controllers when they are
 found, including adapters present at startup and adapters connected later. It
-does not control whether `bluetooth.service` is enabled. On the validated
-ThinkPad, `bluetoothd`, `blueman-applet`, and `blueman-tray` still start, while
-the radio starts unavailable behind its Bluetooth soft block. Enabling it in
-Blueman exposes `hci0`, clears the block, and produces `Powered: yes`; disabling
-it again leaves the controller at `Powered: no` and `PowerState: off`.
+does not control whether `bluetooth.service` is enabled or suppress a separate
+XDG autostart client. The final desktop therefore combines it with a user-level
+override for the package-owned Blueman applet and an rfkill-aware Waybar helper.
+On the validated ThinkPad, `bluetoothd` starts but `blueman-applet` and
+`blueman-tray` do not; the enumerated controller remains `Powered: no` until the
+user requests it.
 
-This is an enabled-daemon, radio-off policy—not a disabled-service policy. It
-keeps pairing, audio, Waybar, and graphical control immediately available while
-avoiding an automatically powered radio. Preserve the original file before
-editing, test after a cold boot, and inspect both layers:
+This is an enabled-daemon, radio-off policy—not a disabled-service policy.
+Waybar provides ordinary power control and opens Blueman Manager on demand for
+pairing or administration. Preserve the original system file before editing,
+test after a cold boot, and inspect both layers:
 
 ```bash
 systemctl is-enabled bluetooth.service
@@ -349,19 +350,25 @@ Blueman provides the graphical equivalent. Do not run a permanent
 `bluetoothctl` interactive shell in parallel simply to keep an agent alive if
 Blueman already supplies the graphical agent for the session.
 
-The Arch Blueman package owns `/etc/xdg/autostart/blueman.desktop`. In this
-project, `niri-session` starts the standard XDG desktop-autostart target, so the
-package can launch one `blueman-applet` process without adding another command
-to the Niri dotfiles. Inspect that ownership and process explicitly:
+The Arch Blueman package owns `/etc/xdg/autostart/blueman.desktop`. The final
+desktop does not need that applet or its tray process permanently because
+Waybar already presents Bluetooth state. The dotfiles deploy the same basename
+at `~/.config/autostart/blueman.desktop` with `Hidden=true`, which overrides the
+system XDG entry without modifying the package-owned file. Inspect all three
+facts explicitly:
 
 ```bash
 pacman -Qo /etc/xdg/autostart/blueman.desktop
-pgrep -a -x blueman-applet
+readlink -f ~/.config/autostart/blueman.desktop
+pgrep -af 'blueman|bluetoothd'
 ```
 
-The applet can provide the session pairing agent and, once Waybar supplies a
-StatusNotifier host, its tray item. It remains a client of the system BlueZ
-daemon; it is not a second Bluetooth stack.
+The expected cold-boot process list contains `bluetoothd` but no
+`blueman-applet` or `blueman-tray`. Waybar calls the reviewed
+`~/.local/bin/toggle-bluetooth` helper: it powers down an active controller, or
+unblocks only Bluetooth, waits for `hci0`, and powers it on. Right click opens
+`blueman-manager` only when a graphical pairing or administration surface is
+needed. Blueman remains a client of BlueZ, not a second Bluetooth stack.
 
 ### Remove, disconnect, and untrust are not synonyms
 
@@ -1432,10 +1439,11 @@ case.
 ## Completion checklist
 
 - [ ] BlueZ is the only enabled Bluetooth system daemon.
-- [ ] `AutoEnable=false` keeps the controller off at boot without disabling
-      BlueZ, Blueman, or Wi-Fi.
-- [ ] Blueman can power the controller on and off without changing the system
-      service state.
+- [ ] `AutoEnable=false` and the XDG override keep the controller off at boot
+      without disabling BlueZ, on-demand Blueman, or Wi-Fi.
+- [ ] Waybar can power the controller on and off across BlueZ and rfkill state;
+      right click can still open Blueman Manager.
+- [ ] No permanent `blueman-applet` or `blueman-tray` process starts with Niri.
 - [ ] rfkill, BlueZ power, discovery, pairing, trust, and connection are
       understood as separate states.
 - [ ] Only identified devices are bonded and trusted.

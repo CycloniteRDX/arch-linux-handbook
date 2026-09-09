@@ -51,7 +51,10 @@ this project rather than a monolithic shell product.
 | Application launcher | Fuzzel | Chapter 23 restyle complete and validated; keep until a concrete capability is missing |
 | Notification service | Mako | Chapter 23 restyle complete and validated; compare SwayNotificationCenter only later |
 | Notification history and control panel | Mako tools only | Twenty-item history and Fuzzel action picker validated in chapter 23; compare SwayNotificationCenter later |
+| Notification icon lookup | Papirus Dark plus Papirus | Final named-icon correction validated in chapter 27 |
 | Wallpaper renderer | swaybg | Static wallpaper and fallback colour accepted; no rotation or automation scripts |
+| Bluetooth presentation | Waybar plus on-demand Blueman Manager | No permanent Blueman applet or tray; rfkill-aware toggle validated in chapter 27 |
+| GTK appearance | GTK settings plus GSettings | Cross-application dark, icon, font and cursor consistency validated in chapter 27 |
 | Qt 6 appearance | qt6ct with Fusion | Keep as the sole Qt 6 widget-theme owner; evaluate exceptions per application |
 | Screen locker | swaylock | Chapter 23 restyle complete and validated; compare hyprlock or gtklock only for a concrete gap |
 | Idle and pre-sleep coordination | swayidle | Keep as sole owner; call the reviewed battery-aware helper at 30 minutes and restore monitors after resume |
@@ -874,8 +877,10 @@ Use separate post-install chapters and dotfiles checkpoints in this order:
    hardware-validated in chapter 25;
 7. install the minimal RogueOS Plymouth theme while preserving the textual
    fallback UKI — complete and hardware-validated in chapter 26;
-8. reconcile GTK and Qt details across representative applications — next;
-9. validate the complete sequence and publish one stable dotfiles release.
+8. reconcile GTK and Qt details across representative applications — complete
+   and hardware-validated in chapter 27;
+9. validate the complete sequence — complete on the first ThinkPad in chapter
+   27; publish the stable dotfiles release after its documentation commit.
 
 Chapters 21 through 24 implement the tracked system and desktop refinements.
 Niri moved forward because its input and refresh behavior was refined alongside
@@ -895,6 +900,15 @@ Repeat the full startup, output, toolkit, notification, locker, idle, resume,
 logout, recovery, and resource matrix. Compare the complete system rather than
 judging isolated screenshots. Only this phase may declare the first fully
 personalized desktop and publish its semantic dotfiles release.
+
+This phase completed on the first ThinkPad on 2026-09-09. GTK 3, GTK
+4/libadwaita, Qt 6, portals, Noto fonts, Papirus icons, Breeze cursors, Mako,
+audio, network, firewall, Bash and all three terminal editors passed their
+combined checks. Lock, manual suspend/resume, monitor restoration, logout,
+tuigreet login, keyring unlock, normal Plymouth/TPM2 boot and the previously
+validated textual fallback remained recoverable. The final Bluetooth policy
+keeps BlueZ available with `Powered: no`, suppresses permanent Blueman applet
+and tray processes, and uses Waybar for a successful off/on/off cycle.
 
 ### Phase 4 — compare optional replacements
 
@@ -949,10 +963,11 @@ screenshot.
 | Themes | GTK 3, GTK 4/libadwaita, Qt if present, XWayland, portals |
 | Icons | Launcher, file manager, notifications, tray, symbolic contrast |
 | Cursor | Compositor, clients, XWayland, locker, greeter |
-| Notifications | Normal, critical, actions, history, DND, calendar reminders |
+| Notifications | Normal, critical, actions, history, calendar reminders, and Papirus named icons |
 | Locker | Bad/good password, all outputs, hotplug, pre-sleep readiness |
 | Idle | Lock, display off/on, cancellation, inhibitors, battery-only suspend |
 | Resume | Locked return, Wi-Fi, audio, Bluetooth, input, TLP, outputs |
+| Bluetooth startup | BlueZ available, controller unpowered, no permanent Blueman applet/tray, Waybar toggle works both ways |
 | Logout | Return to one greeter; no stale session components |
 | Recovery | TTY3, manual Niri, revert one Stow package and one commit |
 | Resources | Idle CPU, wakeups, memory, polling processes |
@@ -1078,8 +1093,13 @@ Never “repair” the greeter by enabling autologin or weakening PAM.
   selected frontend; it remembers the selected session but not the username.
 - The separate Bash, Nano, Micro, and Vim packages are complete and
   hardware-validated in chapter 25. Plymouth's minimal RogueOS theme is
-  complete and hardware-validated in chapter 26. GTK/Qt consistency is the
-  next open presentation review.
+  complete and hardware-validated in chapter 26. GTK/Qt consistency and the
+  complete cross-component lifecycle are hardware-validated in chapter 27.
+- Mako uses Papirus Dark plus Papirus for named icons; the Adwaita path in the
+  historical chapter 23 checkpoint did not resolve the tested symbolic names.
+- BlueZ remains available at boot with the controller unpowered. Waybar owns
+  routine toggling, Blueman Manager is on demand, and the permanent Blueman
+  applet/tray XDG autostart is suppressed at user scope.
 - Plymouth reuses Arch's packaged watermark and encrypted-root controls; the
   independent textual fallback UKI remains outside the theme.
 - TLP plus `tlp-pd` remains the sole hardware power-profile provider.

@@ -19,7 +19,9 @@ packages, while the workstation guide distinguishes BlueZ service state from
 the selected adapter-off-at-boot policy. The boot guide now records chapter
 26's hardware-validated RogueOS Plymouth presentation, its reuse of packaged
 Arch assets, and the current systemd TPM2-token discovery behavior observed in
-the textual fallback.
+the textual fallback. The final desktop review now also records the completed
+GTK/Qt consistency pass, Papirus-backed Mako icon lookup, on-demand Bluetooth
+policy, and successful global lifecycle validation on 2026-09-09.
 
 ## Purpose
 

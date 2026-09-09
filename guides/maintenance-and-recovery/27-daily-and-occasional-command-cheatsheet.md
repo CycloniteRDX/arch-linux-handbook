@@ -70,8 +70,7 @@ systemctl suspend
 tlpctl balanced
 tlpctl power-saver
 tlpctl performance
-bluetoothctl power on
-bluetoothctl power off
+~/.local/bin/toggle-bluetooth
 nmcli radio wifi on
 nmcli radio wifi off
 ```
@@ -545,18 +544,21 @@ bluetoothctl devices
 rfkill list bluetooth
 ```
 
-Keep the BlueZ service enabled and normally control only adapter power:
+Keep the BlueZ service enabled. On the validated Niri desktop, use the reviewed
+helper behind Waybar so a soft block and BlueZ power are handled together:
 
 ```bash
-bluetoothctl power on
-bluetoothctl power off
+~/.local/bin/toggle-bluetooth
 ```
 
-If the adapter has only a software block:
+Use the lower-level sequence only for diagnosis. If the adapter has a software
+block, unblock Bluetooth specifically, wait for the controller, then request
+BlueZ power:
 
 ```bash
-sudo rfkill unblock bluetooth
+rfkill unblock bluetooth
 rfkill list bluetooth
+bluetoothctl power on
 ```
 
 Do not use `rfkill unblock all`; it can alter deliberate Wi-Fi or WWAN state.

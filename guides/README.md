@@ -81,9 +81,10 @@ only when its first reviewed article is ready.
   policy, profiles, routes, defaults, compatibility APIs, state, latency,
   verification, and recovery.
 - [Bluetooth, removable media, and Secret Service](workstation/12-bluetooth-removable-media-and-secret-service.md)
-  explains BlueZ devices and trust, UDisks authorization, udiskie automount,
-  GIO/GVfs and MTP, GNOME Keyring, Secret Service, PAM unlock paths, safe
-  removal, verification, and recovery.
+  explains BlueZ devices and trust, the final daemon-on/radio-off policy,
+  rfkill-aware Waybar control, on-demand Blueman, UDisks authorization, udiskie
+  automount, GIO/GVfs and MTP, GNOME Keyring, Secret Service, PAM unlock paths,
+  safe removal, verification, and recovery.
 - [TLP, logind, idle handling, and suspend](workstation/13-tlp-logind-idle-and-suspend.md)
   explains power-policy ownership, TLP profiles, ThinkPad charge thresholds,
   platform profiles, lid handling, sleep states, inhibitors, pre-suspend
@@ -122,8 +123,8 @@ only when its first reviewed article is ready.
   selects a personal modular Niri desktop, separates themes, icons, cursors,
   wallpapers, Qt 6 appearance, notifications, widgets, locking, the stable
   tuigreet boundary, Plymouth presentation, and idle ownership; it records the
-  selected battery-aware automatic-suspend path, the current-component
-  personalization sequence, and the later reversible roadmap toward optional
+  selected battery-aware automatic-suspend path, the completed GTK/Qt and
+  cross-component validation, and the later reversible roadmap toward optional
   SwayNC, Eww, wallpaper, and locker experiments.
 
 ### Maintenance and recovery
