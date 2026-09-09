@@ -170,6 +170,10 @@ The first essential edition and all seven accepted extensions are complete.
 New subjects may still be added when they expose a missing conceptual or
 recovery boundary.
 
+The companion post-install repository owns chapter 28's concise clean-install
+reconstruction. It reuses these guides for explanation and failure recovery;
+no duplicate handbook installation guide is planned.
+
 | Guide family | Planned subjects |
 | --- | --- |
 | Foundations | Shell basics, paths, permissions, redirection, editors, logs, and documentation workflow. |

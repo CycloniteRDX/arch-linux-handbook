@@ -22,6 +22,9 @@ Arch assets, and the current systemd TPM2-token discovery behavior observed in
 the textual fallback. The final desktop review now also records the completed
 GTK/Qt consistency pass, Papirus-backed Mako icon lookup, on-demand Bluetooth
 policy, and successful global lifecycle validation on 2026-09-09.
+The concise clean-install reconstruction belongs to post-install chapter 28.
+The handbook remains the explanatory and diagnostic layer and does not
+duplicate that command sequence.
 
 ## Purpose
 
